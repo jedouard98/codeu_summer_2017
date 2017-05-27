@@ -34,9 +34,11 @@ public final class Chat {
   // panel to the top of the stack. When a command wants to go to the previous
   // panel all it needs to do is pop the top panel.
   private final Stack<Panel> panels = new Stack<>();
+  private final Context context;
 
   public Chat(Context context) {
     this.panels.push(createRootPanel(context));
+    this.context = context;
   }
 
   // HANDLE COMMAND
@@ -51,7 +53,7 @@ public final class Chat {
 
     final String command = tokens.hasNext() ? tokens.next() : "";
 
-    // Because "exit" and "back" are applicable to every panel, handle
+    // Because "exit", "back", and "version" are applicable to every panel, handle
     // those commands here to avoid having to implement them for each
     // panel.
 
@@ -63,6 +65,12 @@ public final class Chat {
     // Do not allow the root panel to be removed.
     if ("back".equals(command) && panels.size() > 1) {
       panels.pop();
+      return true;
+    }
+
+    // Returns the version of the server
+    if ("version".equals(command)) {
+      System.out.println("Server version #: " + context.Version());
       return true;
     }
 

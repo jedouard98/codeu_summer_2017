@@ -47,4 +47,10 @@ public final class Context {
     }
     return users;
   }
+
+  public String Version() {
+    final String version;
+    version = view.getVersion();
+    return version;
+  }
 }

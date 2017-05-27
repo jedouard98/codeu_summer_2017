@@ -119,6 +119,18 @@ public final class Server {
       }
     });
 
+    // Get Server Version - A client wants to know the version of the server
+    this.commands.put(NetworkCode.GET_SERVER_INFO_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        String version = view.getVersion();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_INFO_RESPONSE);
+        Serializers.STRING.write(out, version);
+      }
+    });
+
     // Get Users - A client wants to get all the users from the back end.
     this.commands.put(NetworkCode.GET_USERS_REQUEST, new Command() {
       @Override

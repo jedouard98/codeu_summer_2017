@@ -48,6 +48,10 @@ public final class View implements BasicView, SinglesView {
     this.model = model;
   }
 
+  @Override
+  public String getVersion() {
+    return model.Version();
+  }
 
   @Override
   public Collection<User> getUsers() {

@@ -31,6 +31,10 @@ import codeu.chat.util.Uuid;
 //   have no effect on the server's state.
 
 public interface BasicView {
+  // GET VERSION
+  //
+  //  Return server version
+  String getVersion();
 
   // GET USERS
   //
