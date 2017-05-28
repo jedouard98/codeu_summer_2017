@@ -115,6 +115,8 @@ public final class Chat {
         System.out.println("    Add a new user with the given name.");
         System.out.println("  u-sign-in <name>");
         System.out.println("    Sign in as the user with the given name.");
+        System.out.println("  version");
+        System.out.println("    Display server version number");
         System.out.println("  exit");
         System.out.println("    Exit the program.");
       }
@@ -215,6 +217,8 @@ public final class Chat {
         System.out.println("    Join the conversation as the current user.");
         System.out.println("  info");
         System.out.println("    Display all info for the current user");
+        System.out.println("  version");
+        System.out.println("    Display server version number");
         System.out.println("  back");
         System.out.println("    Go back to ROOT MODE.");
         System.out.println("  exit");
@@ -332,6 +336,8 @@ public final class Chat {
         System.out.println("    Add a new message to the current conversation as the current user.");
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
+        System.out.println("  version");
+        System.out.println("    Display server version number");
         System.out.println("  back");
         System.out.println("    Go back to USER MODE.");
         System.out.println("  exit");
