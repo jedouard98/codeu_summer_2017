@@ -46,6 +46,27 @@ final class View implements BasicView {
   }
 
   @Override
+  public Time getUptime() {
+
+    Time uptime = null;
+
+    try (final Connection connection = source.connect()) {
+      Serializers.INTEGER.write(connection.out(), NetworkCode.GET_SERVER_UPTIME_REQUEST);
+
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_SERVER_UPTIME_RESPONSE) {
+        uptime = Serializers.nullable(Time.SERIALIZER).read(connection.in());
+      } else {
+        LOG.error("Response from server failed.");
+      }
+
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+    return uptime;
+  }
+
+  @Override
   public String getVersion() {
 
     String version = null;

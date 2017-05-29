@@ -74,6 +74,12 @@ public final class Chat {
       return true;
     }
 
+    // Returns how long the server has been running
+    if ("uptime".equals(command)) {
+      System.out.println("Server has been up since " + context.Uptime());
+      return true;
+    }
+
     if (panels.peek().handleCommand(command, tokens)) {
       // the command was handled
       return true;
@@ -115,6 +121,8 @@ public final class Chat {
         System.out.println("    Add a new user with the given name.");
         System.out.println("  u-sign-in <name>");
         System.out.println("    Sign in as the user with the given name.");
+        System.out.println("  uptime");
+        System.out.println("    Display how long server has been running");
         System.out.println("  version");
         System.out.println("    Display server version number");
         System.out.println("  exit");
@@ -217,6 +225,8 @@ public final class Chat {
         System.out.println("    Join the conversation as the current user.");
         System.out.println("  info");
         System.out.println("    Display all info for the current user");
+        System.out.println("  uptime");
+        System.out.println("    Display how long server has been running");
         System.out.println("  version");
         System.out.println("    Display server version number");
         System.out.println("  back");
@@ -336,6 +346,8 @@ public final class Chat {
         System.out.println("    Add a new message to the current conversation as the current user.");
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
+        System.out.println("  uptime");
+        System.out.println("    Display how long server has been running");
         System.out.println("  version");
         System.out.println("    Display server version number");
         System.out.println("  back");

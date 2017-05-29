@@ -119,6 +119,18 @@ public final class Server {
       }
     });
 
+    // Get Server Uptime - A client wants to know how long the server has been up
+    this.commands.put(NetworkCode.GET_SERVER_UPTIME_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        Time uptime = view.getUptime();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
+        Serializers.nullable(Time.SERIALIZER).write(out, uptime);
+      }
+    });
+
     // Get Server Version - A client wants to know the version of the server
     this.commands.put(NetworkCode.GET_SERVER_INFO_REQUEST, new Command() {
       @Override

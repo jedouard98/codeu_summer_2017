@@ -68,11 +68,16 @@ public final class Model {
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
 
   private final String version = "1.0";
+  private final Time uptime = Time.now();
 
   public void add(User user) {
     userById.insert(user.id, user);
     userByTime.insert(user.creation, user);
     userByText.insert(user.name, user);
+  }
+
+  public Time Uptime() {
+    return uptime;
   }
 
   public String Version() {
