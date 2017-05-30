@@ -47,4 +47,9 @@ public final class Context {
     }
     return users;
   }
+
+  public String Version(){
+    return view.getServerVersion();
+  }
+
 }

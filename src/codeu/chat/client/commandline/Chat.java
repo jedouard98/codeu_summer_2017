@@ -34,9 +34,11 @@ public final class Chat {
   // panel to the top of the stack. When a command wants to go to the previous
   // panel all it needs to do is pop the top panel.
   private final Stack<Panel> panels = new Stack<>();
+  private final Context context;
 
   public Chat(Context context) {
     this.panels.push(createRootPanel(context));
+    this.context = context;
   }
 
   // HANDLE COMMAND
@@ -63,6 +65,11 @@ public final class Chat {
     // Do not allow the root panel to be removed.
     if ("back".equals(command) && panels.size() > 1) {
       panels.pop();
+      return true;
+    }
+
+    if ("version-check".equals(command)) {
+      System.out.println("Version number: " + context.Version());
       return true;
     }
 
@@ -101,6 +108,8 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("ROOT MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
         System.out.println("  u-list");
         System.out.println("    List all users.");
         System.out.println("  u-add <name>");
@@ -199,6 +208,8 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("USER MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
         System.out.println("  c-list");
         System.out.println("    List all conversations that the current user can interact with.");
         System.out.println("  c-add <title>");
@@ -318,6 +329,8 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("USER MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
         System.out.println("  m-list");
         System.out.println("    List all messages in the current conversation.");
         System.out.println("  m-add <message>");

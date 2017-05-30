@@ -172,6 +172,18 @@ public final class Server {
       }
     });
 
+    // Get Server Version - A client wants to get the version of the server from the back end.
+    this.commands.put(NetworkCode.GET_SERVER_VERSION_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        final String version = view.getServerVersion();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_VERSION_RESPONSE);
+        Serializers.STRING.write(out, version);
+      }
+    });
+
     this.timeline.scheduleNow(new Runnable() {
       @Override
       public void run() {

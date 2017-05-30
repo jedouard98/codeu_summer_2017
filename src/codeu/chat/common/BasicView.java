@@ -32,6 +32,11 @@ import codeu.chat.util.Uuid;
 
 public interface BasicView {
 
+  // GET VERSION
+  //
+  //  Return server version
+  String getServerVersion();
+
   // GET USERS
   //
   //   Return all users whose id is found in the given collection.
