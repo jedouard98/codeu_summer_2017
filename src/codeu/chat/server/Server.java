@@ -184,6 +184,18 @@ public final class Server {
       }
     });
 
+    // Get Up Time - A client wants to get the amount of time the server has been running.
+    this.commands.put(NetworkCode.GET_TIME_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        final Time time = view.getUpTime();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_TIME_RESPONSE);
+        time.SERIALIZER.write(out, time);
+      }
+    });
+
     this.timeline.scheduleNow(new Runnable() {
       @Override
       public void run() {

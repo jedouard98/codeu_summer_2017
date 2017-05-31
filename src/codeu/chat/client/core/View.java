@@ -90,6 +90,26 @@ final class View implements BasicView {
   }
 
   @Override
+  public Time getUpTime(){
+
+    Time time = null;
+
+    try (final Connection connection = source.connect()) {
+      Serializers.INTEGER.write(connection.out(), NetworkCode.GET_TIME_REQUEST);
+
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_TIME_RESPONSE) {
+        time = time.SERIALIZER.read(connection.in());
+      } else {
+        LOG.error("Response from server failed.");
+      }
+
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+    return time;
+  }
+  @Override
   public Collection<ConversationHeader> getConversations() {
 
     final Collection<ConversationHeader> summaries = new ArrayList<>();

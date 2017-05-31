@@ -67,14 +67,20 @@ public final class Model {
   private final Store<Time, Message> messageByTime = new Store<>(TIME_COMPARE);
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
   private final String version = "1.1";
+  private final Time time = Time.now();
 
   public void add(User user) {
     userById.insert(user.id, user);
     userByTime.insert(user.creation, user);
     userByText.insert(user.name, user);
   }
+
   public String getVersion(){
     return version;
+  }
+
+  public Time getTime(){
+    return time;
   }
 
   public StoreAccessor<Uuid, User> userById() {

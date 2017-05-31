@@ -23,6 +23,7 @@ import codeu.chat.client.core.Context;
 import codeu.chat.client.core.ConversationContext;
 import codeu.chat.client.core.MessageContext;
 import codeu.chat.client.core.UserContext;
+import codeu.chat.util.Time;
 
 public final class Chat {
 
@@ -47,6 +48,11 @@ public final class Chat {
   // is willing to take another command, the function will return true. If
   // the system wants to exit, the function will return false.
   //
+
+  private static double toSeconds(double n){
+    return n*(0.001);
+  }
+
   public boolean handleCommand(String line) {
 
     final Scanner tokens = new Scanner(line.trim());
@@ -70,6 +76,14 @@ public final class Chat {
 
     if ("version-check".equals(command)) {
       System.out.println("Version number: " + context.Version());
+      return true;
+    }
+
+    if ("up-time".equals(command)) {
+      Time serverTime = context.getTime();
+      Time now = Time.now();
+      double difference = now.inMs() - serverTime.inMs();
+      System.out.println("Server has been running for: " + toSeconds(difference) + "seconds");
       return true;
     }
 
@@ -110,6 +124,8 @@ public final class Chat {
         System.out.println("ROOT MODE");
         System.out.println("  version-check");
         System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  u-list");
         System.out.println("    List all users.");
         System.out.println("  u-add <name>");
@@ -210,6 +226,8 @@ public final class Chat {
         System.out.println("USER MODE");
         System.out.println("  version-check");
         System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  c-list");
         System.out.println("    List all conversations that the current user can interact with.");
         System.out.println("  c-add <title>");
@@ -331,6 +349,8 @@ public final class Chat {
         System.out.println("USER MODE");
         System.out.println("  version-check");
         System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  m-list");
         System.out.println("    List all messages in the current conversation.");
         System.out.println("  m-add <message>");

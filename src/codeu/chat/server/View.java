@@ -93,6 +93,11 @@ public final class View implements BasicView, SinglesView {
     return model.getVersion();
   }
 
+  @Override
+  public Time getUpTime(){
+    return model.getTime();
+  }
+
   private static <T> Collection<T> intersect(StoreAccessor<Uuid, T> store, Collection<Uuid> ids) {
 
     // Use a set to hold the found users as this will prevent duplicate ids from
