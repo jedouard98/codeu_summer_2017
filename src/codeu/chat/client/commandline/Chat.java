@@ -41,23 +41,45 @@ public final class Chat {
     this.panels.push(createRootPanel(context));
     this.context = context;
   }
-
-  // HANDLE COMMAND
-  //
-  // Take a single line of input and parse a command from it. If the system
-  // is willing to take another command, the function will return true. If
-  // the system wants to exit, the function will return false.
-  //
-
+  /*
+  * converts from nanoseconds to seconds
+  **/
   private static double toSeconds(double n){
     return n*(0.001);
   }
+  /**
+  * Tokenize command for Tokeizer implementation
+  * @pre: it has next
+  * @post returns next token where "substring" is a token
+  **/
+  private static String Tokenize(Scanner it){
+      String next = it.next();
+      boolean endOfQuotation = false;
+      if(next.charAt(0) == '\"' && (!next.substring(1).contains("\"") || next.charAt(1) == '\\')){
+          while(!endOfQuotation){
+              String forward = it.next();
+              next += " " + forward;
+              endOfQuotation = forward.contains("\"");
+          }
+      }
+      next = (next.charAt(0) == '\"' && next.charAt(next.length()-1) == '\"')
+        ? next.substring(1,next.length()-1) : next; //trims next if enclosed by quotations
+      return next;
+  }
+
+
+    // HANDLE COMMAND
+    //
+    // Take a single line of input and parse a command from it. If the system
+    // is willing to take another command, the function will return true. If
+    // the system wants to exit, the function will return false.
+    //
 
   public boolean handleCommand(String line) {
 
     final Scanner tokens = new Scanner(line.trim());
 
-    final String command = tokens.hasNext() ? tokens.next() : "";
+    final String command = tokens.hasNext() ? Tokenize(tokens):"";
 
     // Because "exit" and "back" are applicable to every panel, handle
     // those commands here to avoid having to implement them for each
@@ -162,7 +184,7 @@ public final class Chat {
     panel.register("u-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           if (context.create(name) == null) {
             System.out.println("ERROR: Failed to create new user");
@@ -181,7 +203,7 @@ public final class Chat {
     panel.register("u-sign-in", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final UserContext user = findUser(name);
           if (user == null) {
@@ -268,7 +290,7 @@ public final class Chat {
     panel.register("c-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = user.start(name);
           if (conversation == null) {
@@ -290,7 +312,7 @@ public final class Chat {
     panel.register("c-join", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = find(name);
           if (conversation == null) {
@@ -395,7 +417,7 @@ public final class Chat {
     panel.register("m-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String message = args.hasNext() ? args.nextLine().trim() : "";
+        final String message = args.hasNext() ? Tokenize(args).trim() : "";
         if (message.length() > 0) {
           conversation.add(message);
         } else {
