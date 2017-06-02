@@ -34,17 +34,17 @@ public final class Tokenizer {
         if (c == '\\')
           lookingForEscapable = true;
         else if (c == '"') {
-          if (token.length == 0) {
-            inQuotes = true;
+          if (inQuotes) {
+            if ((i + 1) < line.length() && !Character.isWhitespace(line.charAt(i+1)))
+              throw new IllegalArgumentException("Character found right after quotation marks. Individual input sections unclear");
+            tokens.add(token.toString());
+            token.setLength(0);
+            inQuotes = false;
           }
           else {
-            if (inQuotes) {
-              if ((i + 1) < line.length() && !Character.isWhitespace(line.charAt(i+1)))
-                throw new IllegalArgumentException("Character found right after quotation marks. Individual input sections unclear");
-              tokens.add(token.toString());
-              token.setLength(0);
-              inQuotes = false;
-            }
+            if ((i - 1) > 0 && !Character.isWhitespace(line.charAt(i-1)))
+              throw new IllegalArgumentException("Character found right before quotation marks. Individual input sections unclear");
+            inQuotes = true;
           }
         }
         else if (Character.isWhitespace(c) && !inQuotes) {
