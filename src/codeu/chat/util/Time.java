@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public final class Time implements Comparable<Time> {
 
@@ -45,6 +46,22 @@ public final class Time implements Comparable<Time> {
   private final Date date;
 
   private Time(long totalMs) { this.date = new Date(totalMs); }
+
+  // A new method which formats milliseconds into a pretty unit of time string
+  public static String formatTimeString(long ms) {
+    int day = (int) TimeUnit.MILLISECONDS.toDays(ms);
+    long hour = TimeUnit.MILLISECONDS.toHours(ms) - (day *24);
+    long minute = TimeUnit.MILLISECONDS.toMinutes(ms) - (TimeUnit.MILLISECONDS.toHours(ms)* 60);
+    long second = TimeUnit.MILLISECONDS.toSeconds(ms) - (TimeUnit.MILLISECONDS.toMinutes(ms) *60);
+
+    String messageDays = (day != 1) ? day + " days " : day + " day ";
+    String messageHours = (hour != 1) ? hour + " hours " : hour + " hour ";
+    String messageMinutes = (minute != 1) ? minute + " minutes " : minute + " minute ";
+    String messageSeconds = (second != 0) ? second + " seconds" : second + "second";
+
+    String message = messageDays + messageHours + messageMinutes + messageSeconds;
+    return message;
+  }
 
   public long inMs() { return date.getTime(); }
 

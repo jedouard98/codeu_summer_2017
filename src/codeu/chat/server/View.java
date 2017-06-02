@@ -49,7 +49,7 @@ public final class View implements BasicView, SinglesView {
   }
 
   @Override
-  public Time getUptime() {
+  public long getUptime() {
     return model.Uptime();
   }
 

@@ -35,7 +35,7 @@ public interface BasicView {
   // GET UPTIME
   //
   //  Return how long the server has been up
-  Time getUptime();
+  long getUptime();
 
   // GET VERSION
   //

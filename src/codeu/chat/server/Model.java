@@ -76,8 +76,8 @@ public final class Model {
     userByText.insert(user.name, user);
   }
 
-  public Time Uptime() {
-    return uptime;
+  public long Uptime() {
+    return Time.now().inMs() - uptime.inMs();
   }
 
   public String Version() {

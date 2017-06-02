@@ -124,10 +124,10 @@ public final class Server {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
-        Time uptime = view.getUptime();
+        long uptime = view.getUptime();
 
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
-        Serializers.nullable(Time.SERIALIZER).write(out, uptime);
+        Serializers.LONG.write(out, uptime);
       }
     });
 

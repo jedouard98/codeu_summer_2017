@@ -16,7 +16,6 @@ package codeu.chat.client.commandline;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Stack;
 
 import codeu.chat.client.core.Context;
@@ -25,6 +24,7 @@ import codeu.chat.client.core.MessageContext;
 import codeu.chat.client.core.UserContext;
 
 import codeu.chat.util.Tokenizer;
+import codeu.chat.util.Time;
 
 public final class Chat {
 
@@ -71,13 +71,13 @@ public final class Chat {
 
       // Returns the version of the server
       if ("version".equals(command)) {
-        System.out.println("Server version #: " + context.Version());
+        System.out.println("This is server version # " + context.Version());
         return true;
       }
 
       // Returns how long the server has been running
       if ("uptime".equals(command)) {
-        System.out.println("Server has been up since " + context.Uptime());
+        System.out.println("Server has been running for " + Time.formatTimeString(context.Uptime()));
         return true;
       }
 

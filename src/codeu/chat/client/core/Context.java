@@ -49,8 +49,8 @@ public final class Context {
     return users;
   }
 
-  public Time Uptime() {
-    final Time uptime;
+  public long Uptime() {
+    final long uptime;
     uptime = view.getUptime();
     return uptime;
   }

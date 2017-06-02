@@ -46,15 +46,15 @@ final class View implements BasicView {
   }
 
   @Override
-  public Time getUptime() {
+  public long getUptime() {
 
-    Time uptime = null;
+    long uptime = -1;
 
     try (final Connection connection = source.connect()) {
       Serializers.INTEGER.write(connection.out(), NetworkCode.GET_SERVER_UPTIME_REQUEST);
 
       if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_SERVER_UPTIME_RESPONSE) {
-        uptime = Serializers.nullable(Time.SERIALIZER).read(connection.in());
+        uptime = Serializers.LONG.read(connection.in());
       } else {
         LOG.error("Response from server failed.");
       }
