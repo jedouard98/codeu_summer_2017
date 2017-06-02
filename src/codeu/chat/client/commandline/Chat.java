@@ -59,12 +59,12 @@ public final class Chat {
           while(!endOfQuotation){
               String forward = it.next();
               next += " " + forward;
-              endOfQuotation = forward.contains("\"");
+              endOfQuotation = (forward.contains("\"") && forward.charAt(0) != '\\');
           }
       }
       next = (next.charAt(0) == '\"' && next.charAt(next.length()-1) == '\"')
         ? next.substring(1,next.length()-1) : next; //trims next if enclosed by quotations
-      return next;
+      return next.replace("\\","");//this is done to accept quotations inside token and ommit escape chars
   }
 
 
