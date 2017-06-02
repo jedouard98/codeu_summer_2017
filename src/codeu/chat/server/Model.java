@@ -67,7 +67,7 @@ public final class Model {
   private final Store<Time, Message> messageByTime = new Store<>(TIME_COMPARE);
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
 
-  private final String version = "1.0";
+  private final String version = "1.1";
   private final Time uptime = Time.now();
 
   public void add(User user) {

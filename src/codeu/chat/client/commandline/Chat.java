@@ -24,6 +24,8 @@ import codeu.chat.client.core.ConversationContext;
 import codeu.chat.client.core.MessageContext;
 import codeu.chat.client.core.UserContext;
 
+import codeu.chat.util.Tokenizer;
+
 public final class Chat {
 
   // PANELS
@@ -48,41 +50,45 @@ public final class Chat {
   // the system wants to exit, the function will return false.
   //
   public boolean handleCommand(String line) {
+    try {
+      final Tokenizer tokens = new Tokenizer(line.trim());
 
-    final Scanner tokens = new Scanner(line.trim());
+      final String command = tokens.hasNext() ? tokens.next() : "";
 
-    final String command = tokens.hasNext() ? tokens.next() : "";
+      // Because "exit", "back", and "version" are applicable to every panel, handle
+      // those commands here to avoid having to implement them for each
+      // panel.
+      if ("exit".equals(command)) {
+        // The user does not want to process any more commands
+        return false;
+      }
 
-    // Because "exit", "back", and "version" are applicable to every panel, handle
-    // those commands here to avoid having to implement them for each
-    // panel.
+      // Do not allow the root panel to be removed.
+      if ("back".equals(command) && panels.size() > 1) {
+        panels.pop();
+        return true;
+      }
 
-    if ("exit".equals(command)) {
-      // The user does not want to process any more commands
-      return false;
+      // Returns the version of the server
+      if ("version".equals(command)) {
+        System.out.println("Server version #: " + context.Version());
+        return true;
+      }
+
+      // Returns how long the server has been running
+      if ("uptime".equals(command)) {
+        System.out.println("Server has been up since " + context.Uptime());
+        return true;
+      }
+
+      if (panels.peek().handleCommand(command, tokens)) {
+        // the command was handled
+        return true;
+      }
     }
-
-    // Do not allow the root panel to be removed.
-    if ("back".equals(command) && panels.size() > 1) {
-      panels.pop();
-      return true;
-    }
-
-    // Returns the version of the server
-    if ("version".equals(command)) {
-      System.out.println("Server version #: " + context.Version());
-      return true;
-    }
-
-    // Returns how long the server has been running
-    if ("uptime".equals(command)) {
-      System.out.println("Server has been up since " + context.Uptime());
-      return true;
-    }
-
-    if (panels.peek().handleCommand(command, tokens)) {
-      // the command was handled
-      return true;
+    catch (IllegalArgumentException e) {
+      // Catch any misformatting or unclear input here and tell user
+      System.out.println("Misformatted Input: " + e.getMessage());
     }
 
     // If we get to here it means that the command was not correctly handled
@@ -113,7 +119,7 @@ public final class Chat {
     //
     panel.register("help", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("ROOT MODE");
         System.out.println("  u-list");
         System.out.println("    List all users.");
@@ -137,7 +143,7 @@ public final class Chat {
     //
     panel.register("u-list", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         for (final UserContext user : context.allUsers()) {
           System.out.format(
               "USER %s (UUID:%s)\n",
@@ -154,8 +160,8 @@ public final class Chat {
     //
     panel.register("u-add", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
         if (name.length() > 0) {
           if (context.create(name) == null) {
             System.out.println("ERROR: Failed to create new user");
@@ -173,8 +179,8 @@ public final class Chat {
     //
     panel.register("u-sign-in", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
         if (name.length() > 0) {
           final UserContext user = findUser(name);
           if (user == null) {
@@ -215,7 +221,7 @@ public final class Chat {
     //
     panel.register("help", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("USER MODE");
         System.out.println("  c-list");
         System.out.println("    List all conversations that the current user can interact with.");
@@ -243,7 +249,7 @@ public final class Chat {
     //
     panel.register("c-list", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         for (final ConversationContext conversation : user.conversations()) {
           System.out.format(
               "CONVERSATION %s (UUID:%s)\n",
@@ -260,8 +266,8 @@ public final class Chat {
     //
     panel.register("c-add", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = user.start(name);
           if (conversation == null) {
@@ -282,8 +288,8 @@ public final class Chat {
     //
     panel.register("c-join", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = find(name);
           if (conversation == null) {
@@ -315,7 +321,7 @@ public final class Chat {
     //
     panel.register("info", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("User Info:");
         System.out.format("  Name : %s\n", user.user.name);
         System.out.format("  Id   : UUID:%s\n", user.user.id);
@@ -338,7 +344,7 @@ public final class Chat {
     //
     panel.register("help", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("USER MODE");
         System.out.println("  m-list");
         System.out.println("    List all messages in the current conversation.");
@@ -364,7 +370,7 @@ public final class Chat {
     //
     panel.register("m-list", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("--- start of conversation ---");
         for (MessageContext message = conversation.firstMessage();
                             message != null;
@@ -387,8 +393,8 @@ public final class Chat {
     //
     panel.register("m-add", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
-        final String message = args.hasNext() ? args.nextLine().trim() : "";
+      public void invoke(Tokenizer args) {
+        final String message = args.hasNext() ? args.next().trim() : "";
         if (message.length() > 0) {
           conversation.add(message);
         } else {
@@ -404,7 +410,7 @@ public final class Chat {
     //
     panel.register("info", new Panel.Command() {
       @Override
-      public void invoke(Scanner args) {
+      public void invoke(Tokenizer args) {
         System.out.println("Conversation Info:");
         System.out.format("  Title : %s\n", conversation.conversation.title);
         System.out.format("  Id    : UUID:%s\n", conversation.conversation.id);
