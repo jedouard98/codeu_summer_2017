@@ -46,9 +46,8 @@ public final class Tokenizer {
           if (!inQuotes && emptyToken(token)) {
             inQuotes = true;
           }
-          else {
+          else
             inQuotes = false;
-          }
         }
         else if (Character.isWhitespace(c) && !inQuotes) {
           // white space denotes the ending of tokens, meaning the token should
