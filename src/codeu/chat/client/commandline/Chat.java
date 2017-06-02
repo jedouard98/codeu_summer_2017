@@ -85,17 +85,20 @@ public final class Chat {
         // the command was handled
         return true;
       }
+
+
+      // If we get to here it means that the command was not correctly handled
+      // so we should let the user know. Still return true as we want to continue
+      // processing future commands.
+      System.out.println("ERROR: Unsupported command");
+      return true;
     }
     catch (IllegalArgumentException e) {
       // Catch any misformatting or unclear input here and tell user
       System.out.println("Misformatted Input: " + e.getMessage());
+      // Still want to continue processing future commands
+      return true;
     }
-
-    // If we get to here it means that the command was not correctly handled
-    // so we should let the user know. Still return true as we want to continue
-    // processing future commands.
-    System.out.println("ERROR: Unsupported command");
-    return true;
   }
 
   // CREATE ROOT PANEL
