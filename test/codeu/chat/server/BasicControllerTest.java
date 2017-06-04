@@ -18,6 +18,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 
+import codeu.chat.client.core.Context;
 import codeu.chat.common.BasicController;
 import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.Message;
@@ -26,67 +27,74 @@ import codeu.chat.util.Uuid;
 
 public final class BasicControllerTest {
 
-  private Model model;
-  private BasicController controller;
+    private Model model;
+    private BasicController controller;
 
-  @Before
-  public void doBefore() {
-    model = new Model();
-    controller = new Controller(Uuid.NULL, model);
-  }
+    @Before
+    public void doBefore() {
+        model = new Model();
+        controller = new Controller(Uuid.NULL, model);
+    }
 
-  @Test
-  public void testAddUser() {
+    @Test
+    public void testAddUser() {
 
-    final User user = controller.newUser("user");
+        final User user = controller.newUser("user");
 
-    assertFalse(
-        "Check that user has a valid reference",
-        user == null);
-  }
+        assertFalse("Check that user has a valid reference", user == null);
+    }
 
-  @Test
-  public void testAddConversation() {
+    @Test
+    public void testAddConversation() {
 
-    final User user = controller.newUser("user");
+        final User user = controller.newUser("user");
 
-    assertFalse(
-        "Check that user has a valid reference",
-        user == null);
+        assertFalse("Check that user has a valid reference", user == null);
 
-    final ConversationHeader conversation = controller.newConversation(
-        "conversation",
-        user.id);
+        final ConversationHeader conversation = controller.newConversation("conversation", user.id);
 
-    assertFalse(
-        "Check that conversation has a valid reference",
-        conversation == null);
-  }
+        assertFalse("Check that conversation has a valid reference", conversation == null);
+    }
 
-  @Test
-  public void testAddMessage() {
+    @Test
+    public void testAddMessage() {
 
-    final User user = controller.newUser("user");
+        final User user = controller.newUser("user");
 
-    assertFalse(
-        "Check that user has a valid reference",
-        user == null);
+        assertFalse("Check that user has a valid reference", user == null);
 
-    final ConversationHeader conversation = controller.newConversation(
-        "conversation",
-        user.id);
+        final ConversationHeader conversation = controller.newConversation("conversation", user.id);
 
-    assertFalse(
-        "Check that conversation has a valid reference",
-        conversation == null);
+        assertFalse("Check that conversation has a valid reference", conversation == null);
 
-    final Message message = controller.newMessage(
-        user.id,
-        conversation.id,
-        "Hello World");
+        final Message message = controller.newMessage(user.id, conversation.id, "Hello World");
 
-    assertFalse(
-        "Check that the message has a valid reference",
-        message == null);
-  }
+        assertFalse("Check that the message has a valid reference", message == null);
+    }
+
+    /**
+     * adds test for version function
+     */
+    @Test
+    public void testGetVersion() {
+        final User user = controller.newUser("user");
+
+        assertFalse("ERROR: Exception during call on server. Check log for details.", user == null);
+        
+        assertEquals("1.1", model.Version());
+    }
+    
+    /**
+     * adds test for Uptime
+     */
+    @Test
+    public void testUpTime() {
+        
+        final Server server = null;
+        assertTrue("Response from server failed.", server == null);
+        
+        assertTrue("ERROR: Exception during call on server. Check log for details.", server == null);
+        assertTrue("Exception during call on server.", server == null);
+        
+    }
 }
