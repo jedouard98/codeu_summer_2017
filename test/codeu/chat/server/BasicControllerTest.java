@@ -23,6 +23,7 @@ import codeu.chat.common.BasicController;
 import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.Message;
 import codeu.chat.common.User;
+import codeu.chat.util.Tokenizer;
 import codeu.chat.util.Uuid;
 
 public final class BasicControllerTest {
@@ -77,11 +78,11 @@ public final class BasicControllerTest {
      */
     @Test
     public void testGetVersion() {
-        final User user = controller.newUser("user");
-
-        assertFalse("ERROR: Exception during call on server. Check log for details.", user == null);
+       
+        String str = model.Version();
+        assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
         
-        assertEquals("1.1", model.Version());
+        assertEquals("1.1", str);
     }
     
     /**
@@ -90,11 +91,36 @@ public final class BasicControllerTest {
     @Test
     public void testUpTime() {
         
-        final Server server = null;
-        assertTrue("Response from server failed.", server == null);
+        model.Uptime();
         
-        assertTrue("ERROR: Exception during call on server. Check log for details.", server == null);
-        assertTrue("Exception during call on server.", server == null);
+        assertFalse("Response from server failed.", model == null);
+        assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
+        assertFalse("Exception during call on server.", model == null);
+        assertNotEquals(0.0, model.Uptime());
+    }
+    
+    /**
+     * adds test for Tokenizer
+     */
+    @Test
+    public void testTokenizer() {
+       
+        String str = "hi how are you";
         
+        Tokenizer t = new Tokenizer(str);
+        
+        assertEquals("hi", t.next());
+        assertEquals("how", t.next());
+        assertEquals("are", t.next());
+        assertEquals("you", t.next());
+        assertFalse(t.hasNext());
+        
+        String str1 = "\"hello how\" are \"you\"";
+        Tokenizer t1 = new Tokenizer(str1);
+        
+        assertEquals("hello how", t1.next());
+        assertEquals("are", t1.next());
+        assertEquals("you", t1.next());
+        assertFalse(t1.hasNext());
     }
 }
