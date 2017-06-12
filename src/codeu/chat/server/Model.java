@@ -68,7 +68,7 @@ public final class Model {
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
 
   private final String version = "1.1";
-  private final Time uptime = Time.now();
+  private final Time serverStartTime = Time.now();
 
   public void add(User user) {
     userById.insert(user.id, user);
@@ -76,11 +76,11 @@ public final class Model {
     userByText.insert(user.name, user);
   }
 
-  public long Uptime() {
-    return Time.now().inMs() - uptime.inMs();
+  public long uptime() {
+    return Time.now().inMs() - serverStartTime.inMs();
   }
 
-  public String Version() {
+  public String version() {
     return version;
   }
 

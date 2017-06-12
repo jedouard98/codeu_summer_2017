@@ -11,7 +11,6 @@ import java.util.LinkedList;
 // wishes. It's interface somewhat mimicks the Scanner class's (of the java
 // util library) to allow the Chat class's easy transition from that class
 // to this one.
-//
 public final class Tokenizer {
   private LinkedList<String> tokens = new LinkedList<String>();
 
@@ -23,7 +22,7 @@ public final class Tokenizer {
   public Tokenizer(String line) {
     StringBuilder token = new StringBuilder();
     boolean inQuotes = false;
-    boolean lookingForEscapable = false; //
+    boolean lookingForEscapable = false;
 
     for (int i = 0; i < line.length(); i++) {
       char c = line.charAt(i);
@@ -35,7 +34,7 @@ public final class Tokenizer {
         }
         else {
           throw new IllegalArgumentException
-          ("Forward slash found before unescapable character.");
+            ("Forward slash found before unescapable character.");
         }
       }
       else {
@@ -53,16 +52,13 @@ public final class Tokenizer {
           // white space denotes the ending of tokens, meaning the token should
           // be added to memory
           addToken(token);
-          clearToken(token);
         }
         else {
           token.append(c);
         }
       }
     }
-
     addToken(token);
-    token = null;
   }
 
   private boolean isEscapableChar(char c) {
@@ -76,8 +72,10 @@ public final class Tokenizer {
 
   // adds token to the tokens list for later access
   private void addToken(StringBuilder token) {
-    if (!emptyToken(token))
+    if (!emptyToken(token)) {
       tokens.add(token.toString());
+      clearToken(token);
+    }
   }
 
   // takes the StringBuilder and empties it for efficient reuse

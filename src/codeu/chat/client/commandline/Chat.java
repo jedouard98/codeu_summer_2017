@@ -50,48 +50,12 @@ public final class Chat {
   // the system wants to exit, the function will return false.
   //
   public boolean handleCommand(String line) {
+    final Tokenizer tokens;
+    final String command;
+
     try {
-      final Tokenizer tokens = new Tokenizer(line.trim());
-
-      final String command = tokens.hasNext() ? tokens.next() : "";
-
-      // Because "exit", "back", and "version" are applicable to every panel, handle
-      // those commands here to avoid having to implement them for each
-      // panel.
-      if ("exit".equals(command)) {
-        // The user does not want to process any more commands
-        return false;
-      }
-
-      // Do not allow the root panel to be removed.
-      if ("back".equals(command) && panels.size() > 1) {
-        panels.pop();
-        return true;
-      }
-
-      // Returns the version of the server
-      if ("version".equals(command)) {
-        System.out.println("This is server version # " + context.Version());
-        return true;
-      }
-
-      // Returns how long the server has been running
-      if ("uptime".equals(command)) {
-        System.out.println("Server has been running for " + Time.formatTimeString(context.Uptime()));
-        return true;
-      }
-
-      if (panels.peek().handleCommand(command, tokens)) {
-        // the command was handled
-        return true;
-      }
-
-
-      // If we get to here it means that the command was not correctly handled
-      // so we should let the user know. Still return true as we want to continue
-      // processing future commands.
-      System.out.println("ERROR: Unsupported command");
-      return true;
+      tokens = new Tokenizer(line.trim());
+      command = tokens.hasNext() ? tokens.next() : "";
     }
     catch (IllegalArgumentException e) {
       // Catch any misformatting or unclear input here and tell user
@@ -99,6 +63,44 @@ public final class Chat {
       // Still want to continue processing future commands
       return true;
     }
+
+    // Because "exit", "back", and "version" are applicable to every panel, handle
+    // those commands here to avoid having to implement them for each
+    // panel.
+    if ("exit".equals(command)) {
+      // The user does not want to process any more commands
+      return false;
+    }
+
+    // Do not allow the root panel to be removed.
+    if ("back".equals(command) && panels.size() > 1) {
+      panels.pop();
+      return true;
+    }
+
+    // Returns the version of the server
+    if ("version".equals(command)) {
+      System.out.println("This is server version # " + context.Version());
+      return true;
+    }
+
+    // Returns how long the server has been running
+    if ("uptime".equals(command)) {
+      System.out.println("Server has been running for " + Time.formatTimeString(context.Uptime()));
+      return true;
+    }
+
+    if (panels.peek().handleCommand(command, tokens)) {
+      // the command was handled
+      return true;
+    }
+
+
+    // If we get to here it means that the command was not correctly handled
+    // so we should let the user know. Still return true as we want to continue
+    // processing future commands.
+    System.out.println("ERROR: Unsupported command");
+    return true;
   }
 
   // CREATE ROOT PANEL
@@ -131,9 +133,9 @@ public final class Chat {
         System.out.println("  u-sign-in <name>");
         System.out.println("    Sign in as the user with the given name.");
         System.out.println("  uptime");
-        System.out.println("    Display how long server has been running");
+        System.out.println("    Display how long server has been running.");
         System.out.println("  version");
-        System.out.println("    Display server version number");
+        System.out.println("    Display server version number.");
         System.out.println("  exit");
         System.out.println("    Exit the program.");
       }
@@ -165,7 +167,10 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String name = args.hasNext() ? args.next().trim() : "";
-        if (name.length() > 0) {
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
           if (context.create(name) == null) {
             System.out.println("ERROR: Failed to create new user");
           }
@@ -184,7 +189,10 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String name = args.hasNext() ? args.next().trim() : "";
-        if (name.length() > 0) {
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
           final UserContext user = findUser(name);
           if (user == null) {
             System.out.format("ERROR: Failed to sign in as '%s'\n", name);
@@ -235,9 +243,9 @@ public final class Chat {
         System.out.println("  info");
         System.out.println("    Display all info for the current user");
         System.out.println("  uptime");
-        System.out.println("    Display how long server has been running");
+        System.out.println("    Display how long server has been running.");
         System.out.println("  version");
-        System.out.println("    Display server version number");
+        System.out.println("    Display server version number.");
         System.out.println("  back");
         System.out.println("    Go back to ROOT MODE.");
         System.out.println("  exit");
@@ -271,7 +279,10 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String name = args.hasNext() ? args.next().trim() : "";
-        if (name.length() > 0) {
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
           final ConversationContext conversation = user.start(name);
           if (conversation == null) {
             System.out.println("ERROR: Failed to create new conversation");
@@ -293,7 +304,10 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String name = args.hasNext() ? args.next().trim() : "";
-        if (name.length() > 0) {
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
           final ConversationContext conversation = find(name);
           if (conversation == null) {
             System.out.format("ERROR: No conversation with name '%s'\n", name);
@@ -356,9 +370,9 @@ public final class Chat {
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
         System.out.println("  uptime");
-        System.out.println("    Display how long server has been running");
+        System.out.println("    Display how long server has been running.");
         System.out.println("  version");
-        System.out.println("    Display server version number");
+        System.out.println("    Display server version number.");
         System.out.println("  back");
         System.out.println("    Go back to USER MODE.");
         System.out.println("  exit");
@@ -398,7 +412,10 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String message = args.hasNext() ? args.next().trim() : "";
-        if (message.length() > 0) {
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (message.length() > 0) {
           conversation.add(message);
         } else {
           System.out.println("ERROR: Messages must contain text");

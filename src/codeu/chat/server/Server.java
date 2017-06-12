@@ -213,7 +213,6 @@ public final class Server {
           LOG.error(ex, "Failed to read update from relay.");
 
         }
-
         timeline.scheduleIn(RELAY_REFRESH_MS, this);
       }
     });

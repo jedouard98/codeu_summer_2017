@@ -54,10 +54,10 @@ public final class Time implements Comparable<Time> {
     long minute = TimeUnit.MILLISECONDS.toMinutes(ms) - (TimeUnit.MILLISECONDS.toHours(ms)* 60);
     long second = TimeUnit.MILLISECONDS.toSeconds(ms) - (TimeUnit.MILLISECONDS.toMinutes(ms) *60);
 
-    String messageDays = (day != 1) ? day + " days " : day + " day ";
-    String messageHours = (hour != 1) ? hour + " hours " : hour + " hour ";
-    String messageMinutes = (minute != 1) ? minute + " minutes " : minute + " minute ";
-    String messageSeconds = (second != 0) ? second + " seconds" : second + "second";
+    String messageDays = day + ((day != 1) ? " days " : " day ");
+    String messageHours = hour + ((hour != 1) ? " hours " : " hour ");
+    String messageMinutes = minute + ((minute != 1) ? " minutes " : " minute ");
+    String messageSeconds =  second + ((second != 1) ? " seconds" : " second");
 
     String message = messageDays + messageHours + messageMinutes + messageSeconds;
     return message;
