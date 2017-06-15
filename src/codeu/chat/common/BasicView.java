@@ -36,7 +36,7 @@ public interface BasicView {
   // GET TIME
   //
   //  Return up time
-  Time getUpTime();
+  long getUpTime();
 
   // GET VERSION
   //

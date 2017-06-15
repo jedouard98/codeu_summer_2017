@@ -90,15 +90,15 @@ final class View implements BasicView {
   }
 
   @Override
-  public Time getUpTime(){
+  public long getUpTime(){
 
-    Time time = null;
+    long time = -1;
 
     try (final Connection connection = source.connect()) {
       Serializers.INTEGER.write(connection.out(), NetworkCode.GET_TIME_REQUEST);
 
       if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_TIME_RESPONSE) {
-        time = time.SERIALIZER.read(connection.in());
+        time = Serializers.LONG.read(connection.in());
       } else {
         LOG.error("Response from server failed.");
       }

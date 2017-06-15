@@ -102,10 +102,8 @@ public final class Chat {
     }
 
     if ("up-time".equals(command)) {
-      Time serverTime = context.getTime();
-      Time now = Time.now();
-      double difference = now.inMs() - serverTime.inMs();
-      System.out.println("Server has been running for: " + toSeconds(difference) + "seconds");
+      long upTime = context.getUpTime();
+      System.out.println("Server has been running for: " + upTime + " nanoseconds");
       return true;
     }
 

@@ -53,7 +53,7 @@ public final class Context {
     return view.getServerVersion();
   }
 
-  public Time getTime(){
+  public long getUpTime(){
     return view.getUpTime();
   }
 }

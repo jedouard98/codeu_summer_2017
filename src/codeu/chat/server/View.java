@@ -94,7 +94,7 @@ public final class View implements BasicView, SinglesView {
   }
 
   @Override
-  public Time getUpTime(){
+  public long getUpTime(){
     return model.getTime();
   }
 

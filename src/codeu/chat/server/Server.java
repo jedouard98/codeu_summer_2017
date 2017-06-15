@@ -42,7 +42,7 @@ import codeu.chat.util.connections.Connection;
 
 public final class Server {
 
-  private interface Command {
+  public interface Command {
     void onMessage(InputStream in, OutputStream out) throws IOException;
   }
 
@@ -64,7 +64,11 @@ public final class Server {
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
+  public TransactionLog transactionLog;
+
   public Server(final Uuid id, final Secret secret, final Relay relay) {
+
+    transactionLog = new TransactionLog();
 
     this.id = id;
     this.secret = secret;
@@ -189,10 +193,10 @@ public final class Server {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
-        final Time time = view.getUpTime();
+        final long upTime = view.getUpTime();
 
         Serializers.INTEGER.write(out, NetworkCode.GET_TIME_RESPONSE);
-        time.SERIALIZER.write(out, time);
+        Serializers.LONG.write(out, upTime);
       }
     });
 
@@ -234,6 +238,15 @@ public final class Server {
             // The message type cannot be handled so return a dummy message.
             Serializers.INTEGER.write(connection.out(), NetworkCode.NO_MESSAGE);
             LOG.info("Connection rejected");
+          } else if (type == NetworkCode.NEW_MESSAGE_REQUEST ||
+                    type == NetworkCode.NEW_USER_REQUEST ||
+                    type == NetworkCode.NEW_CONVERSATION_REQUEST) {
+              Transaction transaction = new Transaction(command, connection.in(), connection.out());
+              transactionLog.add(transaction);
+              System.out.println("here" + transactionLog.transactionLog);
+              command.onMessage(connection.in(), connection.out());
+              LOG.info("Connection accepted");
+
           } else {
             command.onMessage(connection.in(), connection.out());
             LOG.info("Connection accepted");

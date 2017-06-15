@@ -79,8 +79,8 @@ public final class Model {
     return version;
   }
 
-  public Time getTime(){
-    return time;
+  public long getTime(){
+    return Time.now().inMs() - time.inMs();
   }
 
   public StoreAccessor<Uuid, User> userById() {
