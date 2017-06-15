@@ -30,6 +30,7 @@ import codeu.chat.util.connections.ClientConnectionSource;
 import codeu.chat.util.connections.Connection;
 import codeu.chat.util.connections.ConnectionSource;
 import codeu.chat.util.connections.ServerConnectionSource;
+import codeu.chat.server.TransactionLog;
 
 final class ServerMain {
 
@@ -96,6 +97,8 @@ final class ServerMain {
                         new RemoteRelay(relaySource);
 
     final Server server = new Server(id, secret, relay);
+    server.transactionLog.flush();
+    //System.out.println("&&&&&" + server.transactionLog.transactionLog);
 
     LOG.info("Created server.");
 

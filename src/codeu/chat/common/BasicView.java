@@ -21,6 +21,7 @@ import codeu.chat.common.ConversationPayload;
 import codeu.chat.common.Message;
 import codeu.chat.common.User;
 import codeu.chat.util.Uuid;
+import codeu.chat.util.Time;
 
 // BASIC VIEW
 //
@@ -31,6 +32,16 @@ import codeu.chat.util.Uuid;
 //   have no effect on the server's state.
 
 public interface BasicView {
+
+  // GET TIME
+  //
+  //  Return up time
+  long getUpTime();
+
+  // GET VERSION
+  //
+  //  Return server version
+  String getServerVersion();
 
   // GET USERS
   //

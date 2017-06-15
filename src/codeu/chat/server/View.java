@@ -88,6 +88,15 @@ public final class View implements BasicView, SinglesView {
 
     return all;
   }
+  @Override
+  public String getServerVersion(){
+    return model.getVersion();
+  }
+
+  @Override
+  public long getUpTime(){
+    return model.getTime();
+  }
 
   private static <T> Collection<T> intersect(StoreAccessor<Uuid, T> store, Collection<Uuid> ids) {
 

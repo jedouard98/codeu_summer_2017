@@ -23,6 +23,7 @@ import codeu.chat.client.core.Context;
 import codeu.chat.client.core.ConversationContext;
 import codeu.chat.client.core.MessageContext;
 import codeu.chat.client.core.UserContext;
+import codeu.chat.util.Time;
 
 public final class Chat {
 
@@ -34,22 +35,51 @@ public final class Chat {
   // panel to the top of the stack. When a command wants to go to the previous
   // panel all it needs to do is pop the top panel.
   private final Stack<Panel> panels = new Stack<>();
+  private final Context context;
 
   public Chat(Context context) {
     this.panels.push(createRootPanel(context));
+    this.context = context;
+  }
+  /*
+  * converts from nanoseconds to seconds
+  **/
+  private static double toSeconds(double n){
+    return n*(0.001);
+  }
+  /**
+  * Tokenize command for Tokeizer implementation
+  * @pre: it has next
+  * @post returns next token where "substring" is a token
+  **/
+  private static String Tokenize(Scanner it){
+      String next = it.next();
+      boolean endOfQuotation = false;
+      if(next.charAt(0) == '\"' && (!next.substring(1).contains("\"") || next.charAt(1) == '\\')){
+          while(!endOfQuotation){
+              String forward = it.next();
+              next += " " + forward;
+              endOfQuotation = (forward.contains("\"") && forward.charAt(0) != '\\');
+          }
+      }
+      next = (next.charAt(0) == '\"' && next.charAt(next.length()-1) == '\"')
+        ? next.substring(1,next.length()-1) : next; //trims next if enclosed by quotations
+      return next.replace("\\","");//this is done to accept quotations inside token and ommit escape chars
   }
 
-  // HANDLE COMMAND
-  //
-  // Take a single line of input and parse a command from it. If the system
-  // is willing to take another command, the function will return true. If
-  // the system wants to exit, the function will return false.
-  //
+
+    // HANDLE COMMAND
+    //
+    // Take a single line of input and parse a command from it. If the system
+    // is willing to take another command, the function will return true. If
+    // the system wants to exit, the function will return false.
+    //
+
   public boolean handleCommand(String line) {
 
     final Scanner tokens = new Scanner(line.trim());
 
-    final String command = tokens.hasNext() ? tokens.next() : "";
+    final String command = tokens.hasNext() ? Tokenize(tokens):"";
 
     // Because "exit" and "back" are applicable to every panel, handle
     // those commands here to avoid having to implement them for each
@@ -63,6 +93,17 @@ public final class Chat {
     // Do not allow the root panel to be removed.
     if ("back".equals(command) && panels.size() > 1) {
       panels.pop();
+      return true;
+    }
+
+    if ("version-check".equals(command)) {
+      System.out.println("Version number: " + context.Version());
+      return true;
+    }
+
+    if ("up-time".equals(command)) {
+      long upTime = context.getUpTime();
+      System.out.println("Server has been running for: " + upTime + " nanoseconds");
       return true;
     }
 
@@ -101,6 +142,10 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("ROOT MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  u-list");
         System.out.println("    List all users.");
         System.out.println("  u-add <name>");
@@ -137,7 +182,7 @@ public final class Chat {
     panel.register("u-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           if (context.create(name) == null) {
             System.out.println("ERROR: Failed to create new user");
@@ -156,7 +201,7 @@ public final class Chat {
     panel.register("u-sign-in", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final UserContext user = findUser(name);
           if (user == null) {
@@ -199,6 +244,10 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("USER MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  c-list");
         System.out.println("    List all conversations that the current user can interact with.");
         System.out.println("  c-add <title>");
@@ -239,7 +288,7 @@ public final class Chat {
     panel.register("c-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = user.start(name);
           if (conversation == null) {
@@ -261,7 +310,7 @@ public final class Chat {
     panel.register("c-join", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String name = args.hasNext() ? args.nextLine().trim() : "";
+        final String name = args.hasNext() ? Tokenize(args).trim() : "";
         if (name.length() > 0) {
           final ConversationContext conversation = find(name);
           if (conversation == null) {
@@ -318,6 +367,10 @@ public final class Chat {
       @Override
       public void invoke(Scanner args) {
         System.out.println("USER MODE");
+        System.out.println("  version-check");
+        System.out.println("    States Server Version");
+        System.out.println("  up-time");
+        System.out.println("    States how long server has been running");
         System.out.println("  m-list");
         System.out.println("    List all messages in the current conversation.");
         System.out.println("  m-add <message>");
@@ -362,7 +415,7 @@ public final class Chat {
     panel.register("m-add", new Panel.Command() {
       @Override
       public void invoke(Scanner args) {
-        final String message = args.hasNext() ? args.nextLine().trim() : "";
+        final String message = args.hasNext() ? Tokenize(args).trim() : "";
         if (message.length() > 0) {
           conversation.add(message);
         } else {
