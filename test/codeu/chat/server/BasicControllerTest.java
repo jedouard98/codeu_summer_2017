@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,99 +28,103 @@ import codeu.chat.util.Uuid;
 
 public final class BasicControllerTest {
 
-    private Model model;
-    private BasicController controller;
+  private Model model;
+  private BasicController controller;
 
-    @Before
-    public void doBefore() {
-        model = new Model();
-        controller = new Controller(Uuid.NULL, model);
-    }
+  @Before
+  public void doBefore() {
+    model = new Model();
+    controller = new Controller(Uuid.NULL, model);
+  }
 
-    @Test
-    public void testAddUser() {
+  @Test
+  public void testAddUser() {
 
-        final User user = controller.newUser("user");
+    final User user = controller.newUser("user");
 
-        assertFalse("Check that user has a valid reference", user == null);
-    }
+    assertFalse("Check that user has a valid reference", user == null);
+  }
 
-    @Test
-    public void testAddConversation() {
+  @Test
+  public void testAddConversation() {
 
-        final User user = controller.newUser("user");
+    final User user = controller.newUser("user");
 
-        assertFalse("Check that user has a valid reference", user == null);
+    assertFalse("Check that user has a valid reference", user == null);
 
-        final ConversationHeader conversation = controller.newConversation("conversation", user.id);
+    final ConversationHeader conversation = controller.newConversation("conversation", user.id);
 
-        assertFalse("Check that conversation has a valid reference", conversation == null);
-    }
+    assertFalse("Check that conversation has a valid reference", conversation == null);
+  }
 
-    @Test
-    public void testAddMessage() {
+  @Test
+  public void testAddMessage() {
 
-        final User user = controller.newUser("user");
+    final User user = controller.newUser("user");
 
-        assertFalse("Check that user has a valid reference", user == null);
+    assertFalse("Check that user has a valid reference", user == null);
 
-        final ConversationHeader conversation = controller.newConversation("conversation", user.id);
+    final ConversationHeader conversation = controller.newConversation("conversation", user.id);
 
-        assertFalse("Check that conversation has a valid reference", conversation == null);
+    assertFalse("Check that conversation has a valid reference", conversation == null);
 
-        final Message message = controller.newMessage(user.id, conversation.id, "Hello World");
+    final Message message = controller.newMessage(user.id, conversation.id, "Hello World");
 
-        assertFalse("Check that the message has a valid reference", message == null);
-    }
+    assertFalse("Check that the message has a valid reference", message == null);
+  }
 
-    /**
-     * adds test for version function
-     */
-    @Test
-    public void testGetVersion() {
-       
-        String str = model.Version();
-        assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
-        
-        assertEquals("1.1", str);
-    }
-    
-    /**
-     * adds test for Uptime
-     */
-    @Test
-    public void testUpTime() {
-        
-        model.Uptime();
-        
-        assertFalse("Response from server failed.", model == null);
-        assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
-        assertFalse("Exception during call on server.", model == null);
-        assertNotEquals(0.0, model.Uptime());
-    }
-    
-    /**
-     * adds test for Tokenizer
-     */
-    @Test
-    public void testTokenizer() {
-       
-        String str = "hi how are you";
-        
-        Tokenizer t = new Tokenizer(str);
-        
-        assertEquals("hi", t.next());
-        assertEquals("how", t.next());
-        assertEquals("are", t.next());
-        assertEquals("you", t.next());
-        assertFalse(t.hasNext());
-        
-        String str1 = "\"hello how\" are \"you\"";
-        Tokenizer t1 = new Tokenizer(str1);
-        
-        assertEquals("hello how", t1.next());
-        assertEquals("are", t1.next());
-        assertEquals("you", t1.next());
-        assertFalse(t1.hasNext());
-    }
+  /**
+   * adds test for version function
+   */
+  @Test
+  public void testGetVersion() {
+
+    assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
+    String str = model.Version();
+    assertNotNull(str);
+  }
+
+  /**
+   * adds test for Uptime
+   */
+  @Test
+  public void testUpTime() {
+
+    model.Uptime();
+    final long l = 0;
+
+    assertFalse("Response from server failed.", model == null);
+    assertTrue(model.Uptime() >= l);
+
+  }
+
+  /**
+   * adds test for Tokenizer
+   */
+  @Test
+  public void testTokenizer() {
+
+    String str = "hi how are you";
+
+    Tokenizer t = new Tokenizer(str);
+
+    assertEquals("hi", t.next());
+    assertEquals("how", t.next());
+    assertEquals("are", t.next());
+    assertEquals("you", t.next());
+    assertFalse(t.hasNext());
+
+    String str1 = "\"hello how\" are \"you\"";
+    Tokenizer t1 = new Tokenizer(str1);
+
+    assertEquals("hello how", t1.next());
+    assertEquals("are", t1.next());
+    assertEquals("you", t1.next());
+    assertFalse(t1.hasNext());
+
+    Tokenizer t2 = new Tokenizer("hi \"how are you");
+    assertEquals("hi", t2.next());
+    assertEquals("how are you", t2.next());
+    assertFalse(t2.hasNext());
+  }
 }
