@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,30 +30,26 @@ public final class ConversationContext {
 
   public final User user;
   public final ConversationHeader conversation;
+  public int count;
 
   private final BasicView view;
   private final BasicController controller;
 
-  public ConversationContext(User user,
-                             ConversationHeader conversation,
-                             BasicView view,
-                             BasicController controller) {
+  public ConversationContext(User user, ConversationHeader conversation, BasicView view,
+      BasicController controller) {
 
     this.user = user;
     this.conversation = conversation;
     this.view = view;
     this.controller = controller;
+    this.count = 0;
   }
 
   public MessageContext add(String messageBody) {
+    count++;
+    final Message message = controller.newMessage(user.id, conversation.id, messageBody);
 
-    final Message message = controller.newMessage(user.id,
-                                                  conversation.id,
-                                                  messageBody);
-
-    return message == null ?
-        null :
-        new MessageContext(message, view);
+    return message == null ? null : new MessageContext(message, view);
   }
 
   public MessageContext firstMessage() {
@@ -62,9 +58,7 @@ public final class ConversationContext {
     // a new copy.
     final ConversationPayload updated = getUpdated();
 
-    return updated == null ?
-        null :
-        getMessage(updated.firstMessage);
+    return updated == null ? null : getMessage(updated.firstMessage);
   }
 
   public MessageContext lastMessage() {
@@ -73,9 +67,11 @@ public final class ConversationContext {
     // a new copy.
     final ConversationPayload updated = getUpdated();
 
-    return updated == null ?
-        null :
-        getMessage(updated.lastMessage);
+    return updated == null ? null : getMessage(updated.lastMessage);
+  }
+
+  public int size() {
+    return count;
   }
 
   private ConversationPayload getUpdated() {
@@ -88,4 +84,5 @@ public final class ConversationContext {
     final Iterator<Message> messages = view.getMessages(Arrays.asList(id)).iterator();
     return messages.hasNext() ? new MessageContext(messages.next(), view) : null;
   }
+
 }
