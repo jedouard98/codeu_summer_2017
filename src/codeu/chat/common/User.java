@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//    http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,10 @@ package codeu.chat.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import codeu.chat.client.core.ConversationContext;
 import codeu.chat.util.Serializer;
 import codeu.chat.util.Serializers;
 import codeu.chat.util.Time;
@@ -39,11 +42,8 @@ public final class User {
     @Override
     public User read(InputStream in) throws IOException {
 
-      return new User(
-          Uuid.SERIALIZER.read(in),
-          Serializers.STRING.read(in),
-          Time.SERIALIZER.read(in)
-      );
+      return new User(Uuid.SERIALIZER.read(in), Serializers.STRING.read(in),
+          Time.SERIALIZER.read(in));
 
     }
   };
@@ -51,12 +51,19 @@ public final class User {
   public final Uuid id;
   public final String name;
   public final Time creation;
+  public HashMap<ConversationContext, Integer> convoFollows;
+  public ArrayList userFollows;
+  //public ArrayList convos;
 
+  
   public User(Uuid id, String name, Time creation) {
 
     this.id = id;
     this.name = name;
     this.creation = creation;
+    convoFollows = new HashMap<ConversationContext, Integer>();
 
   }
+  
+  
 }
