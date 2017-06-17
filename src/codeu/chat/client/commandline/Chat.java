@@ -241,7 +241,7 @@ public final class Chat {
         System.out.println("  c-join <title>");
         System.out.println("    Join the conversation as the current user.");
         System.out.println("  info");
-        System.out.println("    Display all info for the current user");
+        System.out.println("    Display all info for the current user.");
         System.out.println("  uptime");
         System.out.println("    Display how long server has been running.");
         System.out.println("  version");
