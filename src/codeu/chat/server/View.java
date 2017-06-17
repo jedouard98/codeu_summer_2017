@@ -48,6 +48,15 @@ public final class View implements BasicView, SinglesView {
     this.model = model;
   }
 
+  @Override
+  public long getUptime() {
+    return model.uptime();
+  }
+
+  @Override
+  public String getVersion() {
+    return model.version();
+  }
 
   @Override
   public Collection<User> getUsers() {
