@@ -28,6 +28,7 @@ import codeu.chat.util.Uuid;
 
 public final class ConversationContext {
 
+  public Integer count;
   public final User user;
   public final ConversationHeader conversation;
 
@@ -43,10 +44,11 @@ public final class ConversationContext {
     this.conversation = conversation;
     this.view = view;
     this.controller = controller;
+    this.count = 0;
   }
 
   public MessageContext add(String messageBody) {
-
+    count = count + 1;
     final Message message = controller.newMessage(user.id,
                                                   conversation.id,
                                                   messageBody);
@@ -76,6 +78,10 @@ public final class ConversationContext {
     return updated == null ?
         null :
         getMessage(updated.lastMessage);
+  }
+
+  public Integer size() {
+    return count;
   }
 
   private ConversationPayload getUpdated() {
