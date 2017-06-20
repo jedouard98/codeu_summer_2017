@@ -136,7 +136,6 @@ public final class Server {
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
         long uptime = view.getUptime();
-
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
       }
     });
