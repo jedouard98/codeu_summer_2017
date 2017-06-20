@@ -19,6 +19,7 @@ import java.io.IOException;
 
 
 public final class Transaction {
+
   private ArrayList<String> transactionsList = new ArrayList<String>();
   private Controller controller;
 

@@ -46,7 +46,6 @@ public final class ConversationContext {
   }
 
   public MessageContext add(String messageBody) {
-
     final Message message = controller.newMessage(user.id,
                                                   conversation.id,
                                                   messageBody);
