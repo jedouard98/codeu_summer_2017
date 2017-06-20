@@ -46,8 +46,6 @@ public final class Server {
     void onMessage(InputStream in, OutputStream out) throws IOException;
   }
 
-  public static Transaction transaction;
-
   private static final Logger.Log LOG = Logger.newLog(Server.class);
 
   private static final int RELAY_REFRESH_MS = 5000;  // 5 seconds
@@ -73,8 +71,6 @@ public final class Server {
     this.controller = new Controller(id, model);
     this.relay = relay;
 
-    this.transaction = new Transaction(controller);
-
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
       @Override
@@ -88,8 +84,6 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_MESSAGE_RESPONSE);
         Serializers.nullable(Message.SERIALIZER).write(out, message);
-
-        transaction.write(message, conversation);
 
         timeline.scheduleNow(createSendToRelayEvent(
             author,
@@ -108,8 +102,6 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_USER_RESPONSE);
         Serializers.nullable(User.SERIALIZER).write(out, user);
-
-        transaction.write(user);
       }
     });
 
@@ -124,8 +116,6 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_CONVERSATION_RESPONSE);
         Serializers.nullable(ConversationHeader.SERIALIZER).write(out, conversation);
-
-        transaction.write(conversation);
       }
     });
 
@@ -138,8 +128,6 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
         Serializers.LONG.write(out, uptime);
-////////////////////////////////// TODO ///////////////////////////////////////
-        transaction.flush();
       }
     });
 
@@ -152,8 +140,6 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_INFO_RESPONSE);
         Serializers.STRING.write(out, version);
-
-
       }
     });
 
@@ -210,19 +196,11 @@ public final class Server {
       }
     });
 
-    this.timeline.scheduleIn(25000, new Runnable() {
-      @Override
-      public void run() {
-        LOG.info("Flushing server info to disc...");
-        transaction.flush();
-        timeline.scheduleIn(25000, this);
-      }
-    });
-
     this.timeline.scheduleNow(new Runnable() {
       @Override
       public void run() {
         try {
+
           LOG.info("Reading update from relay...");
 
           for (final Relay.Bundle bundle : relay.read(id, secret, lastSeen, 32)) {
