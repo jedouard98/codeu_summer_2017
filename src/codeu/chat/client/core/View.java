@@ -46,6 +46,48 @@ final class View implements BasicView {
   }
 
   @Override
+  public long getUptime() {
+
+    long uptime = -1;
+
+    try (final Connection connection = source.connect()) {
+      Serializers.INTEGER.write(connection.out(), NetworkCode.GET_SERVER_UPTIME_REQUEST);
+
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_SERVER_UPTIME_RESPONSE) {
+        uptime = Serializers.LONG.read(connection.in());
+      } else {
+        LOG.error("Response from server failed.");
+      }
+
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+    return uptime;
+  }
+
+  @Override
+  public String getVersion() {
+
+    String version = null;
+
+    try (final Connection connection = source.connect()) {
+      Serializers.INTEGER.write(connection.out(), NetworkCode.GET_SERVER_INFO_REQUEST);
+
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_SERVER_INFO_RESPONSE) {
+        version = Serializers.STRING.read(connection.in());
+      } else {
+        LOG.error("Response from server failed.");
+      }
+
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+    return version;
+  }
+
+  @Override
   public Collection<User> getUsers() {
 
     final Collection<User> users = new ArrayList<>();

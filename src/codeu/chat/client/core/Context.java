@@ -22,6 +22,7 @@ import codeu.chat.common.BasicView;
 import codeu.chat.common.User;
 import codeu.chat.util.Uuid;
 import codeu.chat.util.connections.ConnectionSource;
+import codeu.chat.util.Time;
 
 public final class Context {
 
@@ -46,5 +47,17 @@ public final class Context {
       users.add(new UserContext(user, view, controller));
     }
     return users;
+  }
+
+  public long Uptime() {
+    final long uptime;
+    uptime = view.getUptime();
+    return uptime;
+  }
+
+  public String Version() {
+    final String version;
+    version = view.getVersion();
+    return version;
   }
 }

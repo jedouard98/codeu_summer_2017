@@ -119,6 +119,30 @@ public final class Server {
       }
     });
 
+    // Get Server Uptime - A client wants to know how long the server has been up
+    this.commands.put(NetworkCode.GET_SERVER_UPTIME_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        long uptime = view.getUptime();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
+        Serializers.LONG.write(out, uptime);
+      }
+    });
+
+    // Get Server Version - A client wants to know the version of the server
+    this.commands.put(NetworkCode.GET_SERVER_INFO_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+
+        String version = view.getVersion();
+
+        Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_INFO_RESPONSE);
+        Serializers.STRING.write(out, version);
+      }
+    });
+
     // Get Users - A client wants to get all the users from the back end.
     this.commands.put(NetworkCode.GET_USERS_REQUEST, new Command() {
       @Override
@@ -189,7 +213,6 @@ public final class Server {
           LOG.error(ex, "Failed to read update from relay.");
 
         }
-
         timeline.scheduleIn(RELAY_REFRESH_MS, this);
       }
     });
