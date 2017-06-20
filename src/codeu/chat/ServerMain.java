@@ -99,6 +99,7 @@ final class ServerMain {
 
     final Server server = new Server(id, secret, relay);
     LOG.info("Created server.");
+
     while (true) {
       try {
         LOG.info("Established connection...");
@@ -110,6 +111,7 @@ final class ServerMain {
       } catch (IOException ex) {
         LOG.error(ex, "Failed to establish connection.");
       }
+
     }
   }
 }
