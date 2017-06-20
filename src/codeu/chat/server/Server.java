@@ -51,6 +51,7 @@ public final class Server {
   private static final Logger.Log LOG = Logger.newLog(Server.class);
 
   private static final int RELAY_REFRESH_MS = 5000;  // 5 seconds
+  private static final int TRANS_REFRESH_MS = 25000;  // 25 seconds
 
   private final Timeline timeline = new Timeline();
 
@@ -210,12 +211,12 @@ public final class Server {
       }
     });
 
-    this.timeline.scheduleIn(25000, new Runnable() {
+    this.timeline.scheduleIn(TRANS_REFRESH_MS, new Runnable() {
       @Override
       public void run() {
         LOG.info("Flushing server info to disc...");
         transaction.flush();
-        timeline.scheduleIn(25000, this);
+        timeline.scheduleIn(TRANS_REFRESH_MS, this);
       }
     });
 

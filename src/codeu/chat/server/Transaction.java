@@ -19,8 +19,8 @@ import java.io.IOException;
 
 
 public final class Transaction {
-  ArrayList<String> transactionsList = new ArrayList<String>();
-  Controller controller;
+  private ArrayList<String> transactionsList = new ArrayList<String>();
+  private Controller controller;
 
   public Transaction(Controller controller) {
     this.controller = controller;
