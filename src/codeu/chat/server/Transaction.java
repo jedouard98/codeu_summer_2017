@@ -45,7 +45,6 @@ public final class Transaction {
       }
     }
     catch (IOException e) {
-      // maybe do something here idk #notthepolice
     }
   }
 
