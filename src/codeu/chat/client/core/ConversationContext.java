@@ -43,7 +43,6 @@ public final class ConversationContext {
     this.conversation = conversation;
     this.view = view;
     this.controller = controller;
-    this.count = 0;
   }
 
   public MessageContext add(String messageBody) {

@@ -110,7 +110,6 @@ final class ServerMain {
       } catch (IOException ex) {
         LOG.error(ex, "Failed to establish connection.");
       }
-
     }
   }
 }
