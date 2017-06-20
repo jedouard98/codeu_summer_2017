@@ -58,9 +58,9 @@ public final class Chat {
       command = tokens.hasNext() ? tokens.next() : "";
     }
     catch (IllegalArgumentException e) {
-      // Catch any misformatting or unclear input here and tell user
+      // Catch any misformatting or unclear input here
+      // and still continue processing future commands
       System.out.println("Misformatted Input: " + e.getMessage());
-      // Still want to continue processing future commands
       return true;
     }
 
