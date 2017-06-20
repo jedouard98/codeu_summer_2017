@@ -58,9 +58,9 @@ public final class Chat {
       command = tokens.hasNext() ? tokens.next() : "";
     }
     catch (IllegalArgumentException e) {
-      // Catch any misformatting or unclear input here and tell user
+      // Catch any misformatting or unclear input here
+      // and still continue processing future commands
       System.out.println("Misformatted Input: " + e.getMessage());
-      // Still want to continue processing future commands
       return true;
     }
 
@@ -330,83 +330,6 @@ public final class Chat {
         return null;
       }
     });
-
-    // C-JOIN (join conversation)
-//
-// Add a command that will joing a conversation when the user enters
-// "c-join" while on the user panel.
-//
-panel.register("c-join", new Panel.Command() {
-  @Override
-  public void invoke(Tokenizer args) {
-    final String name = args.hasNext() ? args.next().trim() : "";
-    if (name.length() > 0) {
-      final ConversationContext conversation = find(name);
-      if (conversation == null) {
-        System.out.format("ERROR: No conversation with name '%s'\n", name);
-      } else {
-        panels.push(createConversationPanel(conversation));
-      }
-    } else {
-      System.out.println("ERROR: Missing <title>");
-    }
-  }
-
-  // Find the first conversation with the given name and return its context.
-  // If no conversation has the given name, this will return null.
-  private ConversationContext find(String title) {
-    for (final ConversationContext conversation : user.conversations()) {
-      if (title.equals(conversation.conversation.title)) {
-        return conversation;
-      }
-    }
-    return null;
-  }
-});
-
-
-/////////////////////////
-panel.register("c-follow", new Panel.Command() {
-  @Override
-  public void invoke(Tokenizer args) {
-    final String name = args.hasNext() ? args.next().trim() : "";
-    if (name.length() > 0) {
-      final ConversationContext conversation = find(name);
-      if (conversation == null) {
-        System.out.format("ERROR: No conversation with name '%s'\n", name);
-      } else {
-        user.user.convoFollows.put(conversation, conversation.size());
-      }
-    } else {
-      System.out.println("ERROR: Missing <title>");
-    }
-  }
-
-  private ConversationContext find(String title) {
-    for (final ConversationContext conversation : user.conversations()) {
-      if (title.equals(conversation.conversation.title)) {
-        return conversation;
-      }
-    }
-    return null;
-  }
-});
-
-panel.register("c-status-update", new Panel.Command() {
-  @Override
-  public void invoke(Tokenizer args) {
-    if (user.user.convoFollows.isEmpty()) {
-      System.out.println("You're not following any conversations");
-    }
-    for (ConversationContext convo : user.user.convoFollows.keySet()) {
-      int newMessagesInt = convo.size() - user.user.convoFollows.get(convo);
-      System.out.println(convo.conversation.title + " has " + newMessagesInt
-          + " new messages since last status update.");
-      user.user.convoFollows.put(convo, convo.size());
-    }
-  }
-});
-////////////////////////
 
     // INFO
     //
