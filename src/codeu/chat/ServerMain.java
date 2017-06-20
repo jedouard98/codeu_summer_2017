@@ -99,7 +99,7 @@ final class ServerMain {
 
     final Server server = new Server(id, secret, relay);
     LOG.info("Created server.");
-
+    Time start = Time.now();
     while (true) {
       try {
         LOG.info("Established connection...");

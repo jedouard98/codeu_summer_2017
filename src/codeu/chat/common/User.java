@@ -52,7 +52,7 @@ public final class User {
   public final Uuid id;
   public final String name;
   public final Time creation;
-  
+
   public User(Uuid id, String name, Time creation) {
 
     this.id = id;
