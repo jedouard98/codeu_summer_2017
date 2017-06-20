@@ -138,6 +138,8 @@ public final class Server {
         long uptime = view.getUptime();
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
         Serializers.LONG.write(out, uptime);
+////////////////////////////////// TODO ///////////////////////////////////////
+        transaction.flush();
       }
     });
 
@@ -150,6 +152,8 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_INFO_RESPONSE);
         Serializers.STRING.write(out, version);
+
+
       }
     });
 

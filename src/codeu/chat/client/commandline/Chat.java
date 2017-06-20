@@ -361,7 +361,6 @@ panel.register("c-join", new Panel.Command() {
     return null;
   }
 });
-
     // INFO
     //
     // Add a command that will print info about the current context when the

@@ -107,7 +107,6 @@ public final class Transaction {
         writer.write(transaction + "\n");
       writer.flush();
     } catch (IOException e) {
-        //
     }
     this.transactionsList = new ArrayList<String>();
   }
