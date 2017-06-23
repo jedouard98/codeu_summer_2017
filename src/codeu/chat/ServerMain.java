@@ -31,6 +31,8 @@ import codeu.chat.util.connections.Connection;
 import codeu.chat.util.connections.ConnectionSource;
 import codeu.chat.util.connections.ServerConnectionSource;
 
+import codeu.chat.util.Time;
+
 final class ServerMain {
 
   private static final Logger.Log LOG = Logger.newLog(ServerMain.class);
@@ -96,13 +98,10 @@ final class ServerMain {
                         new RemoteRelay(relaySource);
 
     final Server server = new Server(id, secret, relay);
-
     LOG.info("Created server.");
-
+    Time start = Time.now();
     while (true) {
-
       try {
-
         LOG.info("Established connection...");
         final Connection connection = serverSource.connect();
         LOG.info("Connection established.");
@@ -112,6 +111,7 @@ final class ServerMain {
       } catch (IOException ex) {
         LOG.error(ex, "Failed to establish connection.");
       }
+
     }
   }
 }

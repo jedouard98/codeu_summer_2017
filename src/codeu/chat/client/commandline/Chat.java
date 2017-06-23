@@ -238,8 +238,6 @@ public final class Chat {
         System.out.println("    List all conversations that the current user can interact with.");
         System.out.println("  c-add <title>");
         System.out.println("    Add a new conversation with the given title and join it as the current user.");
-        System.out.println("  c-join <title>");
-        System.out.println("    Join the conversation as the current user.");
         System.out.println("  info");
         System.out.println("    Display all info for the current user.");
         System.out.println("  uptime");
@@ -330,6 +328,39 @@ public final class Chat {
         return null;
       }
     });
+
+    // C-JOIN (join conversation)
+//
+// Add a command that will joing a conversation when the user enters
+// "c-join" while on the user panel.
+//
+panel.register("c-join", new Panel.Command() {
+  @Override
+  public void invoke(Tokenizer args) {
+    final String name = args.hasNext() ? args.next().trim() : "";
+    if (name.length() > 0) {
+      final ConversationContext conversation = find(name);
+      if (conversation == null) {
+        System.out.format("ERROR: No conversation with name '%s'\n", name);
+      } else {
+        panels.push(createConversationPanel(conversation));
+      }
+    } else {
+      System.out.println("ERROR: Missing <title>");
+    }
+  }
+
+  // Find the first conversation with the given name and return its context.
+  // If no conversation has the given name, this will return null.
+  private ConversationContext find(String title) {
+    for (final ConversationContext conversation : user.conversations()) {
+      if (title.equals(conversation.conversation.title)) {
+        return conversation;
+      }
+    }
+    return null;
+  }
+});
 
     // INFO
     //
