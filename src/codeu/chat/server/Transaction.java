@@ -95,7 +95,6 @@ public final class Transaction {
       controller.newConversation(id, title, owner, creation);
     }
     catch (IOException e) {
-
     }
   }
 
