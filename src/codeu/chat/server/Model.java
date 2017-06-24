@@ -15,6 +15,7 @@
 package codeu.chat.server;
 
 import java.util.Comparator;
+import java.util.HashMap;
 
 import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.ConversationPayload;
@@ -67,13 +68,55 @@ public final class Model {
   private final Store<Time, Message> messageByTime = new Store<>(TIME_COMPARE);
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
 
+  private final HashMap<Uuid, HashMap<Uuid, Integer>> userConversationTracking = new HashMap<Uuid, HashMap<Uuid, Integer>>();
+
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
 
   public void add(User user) {
+    userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);
     userByTime.insert(user.creation, user);
     userByText.insert(user.name, user);
+  }
+
+  public String statusUpdate(Uuid user) {
+    StringBuilder status = new StringBuilder();
+    HashMap<Uuid, Integer> userConversationSize = userConversationTracking.get(user);
+    for (Uuid conversation : userConversationSize.keySet()) {
+      ConversationHeader convo = conversationById().first(conversation);
+      String title = convo.title;
+      int newMessages = convo.size - userConversationSize.get(conversation);
+      String line = String.format("CONVERSATION %s: You have %d new messages!\n", title, newMessages);
+      status.append(line);
+      userConversationTracking.get(user).put(conversation, convo.size);
+    }
+    User userA = userById().first(user);
+    status.append(userA.statusUpdate());
+    return status.toString();
+  }
+
+  public void unfollowUser(User userA, User userB) {
+    User user1 = userById().first(userA.id);
+    User user2 = userById().first(userB.id);
+    User.unfollow(user1, user2);
+  }
+
+  public void followUser(User userA, User userB) {
+    User user1 = userById().first(userA.id);
+    User user2 = userById().first(userB.id);
+    User.follow(user1, user2);
+  }
+
+  public void unfollowConversation(Uuid user, Uuid conversation) {
+    userConversationTracking.get(user).remove(conversation);
+  }
+
+  public void followConversation(Uuid user, Uuid conversation) {
+    // Put into hashmap the conversation and what the size of the conversation
+    // is for the user at the time of following
+    ConversationHeader convo = conversationById().first(conversation);
+    userConversationTracking.get(user).put(conversation, convo.size);
   }
 
   public long uptime() {
@@ -96,7 +139,8 @@ public final class Model {
     return userByText;
   }
 
-  public void add(ConversationHeader conversation) {
+  public void add(User user, ConversationHeader conversation) {
+    user.addCreatedConversation(conversation);
     conversationById.insert(conversation.id, conversation);
     conversationByTime.insert(conversation.creation, conversation);
     conversationByText.insert(conversation.title, conversation);
