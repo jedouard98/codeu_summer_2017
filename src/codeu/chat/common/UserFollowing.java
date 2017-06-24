@@ -34,18 +34,6 @@ public final class  UserFollowing {
     return status.toString();
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-       return true;
-    if (obj == null)
-       return false;
-    if (getClass() != obj.getClass())
-       return false;
-    UserFollowing that = (UserFollowing) obj;
-    return (this.userFollower == that.userFollower && this.userBeingFollowed == that.userBeingFollowed);
-  }
-
   public void addCreatedConversation(ConversationHeader conversation) {
     createdConversations.add(conversation);
   }
