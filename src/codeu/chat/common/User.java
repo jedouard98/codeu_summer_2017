@@ -23,7 +23,7 @@ import codeu.chat.util.Serializers;
 import codeu.chat.util.Time;
 import codeu.chat.util.Uuid;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public final class User {
 
@@ -53,45 +53,44 @@ public final class User {
   public final Uuid id;
   public final String name;
   public final Time creation;
-  public ArrayList<UserFollowing> following;
-  public ArrayList<UserFollowing> followers;
+  public HashMap<Uuid, UserFollowing> following;
+  public HashMap<Uuid, UserFollowing> followers;
 
   public User(Uuid id, String name, Time creation) {
     this.id = id;
     this.name = name;
     this.creation = creation;
-    this.following = new ArrayList<UserFollowing>();
-    this.followers = new ArrayList<UserFollowing>();
+    this.following = new HashMap<Uuid, UserFollowing>();
+    this.followers = new HashMap<Uuid, UserFollowing>();
   }
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    for (UserFollowing connection : following)
-      status.append(connection.statusUpdate());
+    for (Uuid user : following.keySet())
+      status.append(following.get(user).statusUpdate());
     return status.toString();
   }
 
   // User A wants to follow User B
   public static void follow(User userA, User userB) {
     UserFollowing connection = new UserFollowing(userA, userB);
-    userA.following.add(connection);
-    userB.followers.add(connection);
+    userA.following.put(userB.id, connection);
+    userB.followers.put(userA.id, connection);
   }
 
   // User A wants to unfollow User B
   public static void unfollow(User userA, User userB) {
-    UserFollowing connection = new UserFollowing(userA, userB);
-    userA.following.remove(connection);
-    userB.followers.remove(connection);
+    userA.following.remove(userB.id);
+    userB.followers.remove(userA.id);
   }
 
   public void addCreatedConversation(ConversationHeader conversation) {
-    for (UserFollowing follower : followers)
-      follower.addCreatedConversation(conversation);
+    for (Uuid user : followers.keySet())
+      followers.get(user).addCreatedConversation(conversation);
   }
 
   public void addJoinedConversation(ConversationHeader conversation) {
-    for (UserFollowing follower : followers)
-      follower.addJoinedConversation(conversation);
+    for (Uuid user : followers.keySet())
+      followers.get(user).addJoinedConversation(conversation);
   }
 }
