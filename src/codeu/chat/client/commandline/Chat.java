@@ -240,6 +240,16 @@ public final class Chat {
         System.out.println("    Add a new conversation with the given title and join it as the current user.");
         System.out.println("  c-join <title>");
         System.out.println("    Join the conversation as the current user.");
+        System.out.println("  u-follow <name>");
+        System.out.println("    Follow a user to get updates on new user activity.");
+        System.out.println("  u-unfollow <name>");
+        System.out.println("    Unfollow a user to stop updates from user activity.");
+        System.out.println("  c-follow <title>");
+        System.out.println("    Follow a conversation to get updates on new messages.");
+        System.out.println("  c-unfollow <title>");
+        System.out.println("    Unfollow a conversation to stop updates from conversation.");
+        System.out.println("  status-update");
+        System.out.println("    Retrieve updates on users and conversations current user is following.");
         System.out.println("  info");
         System.out.println("    Display all info for the current user.");
         System.out.println("  uptime");
@@ -252,6 +262,8 @@ public final class Chat {
         System.out.println("    Exit the program.");
       }
     });
+
+
 
     // C-LIST (list conversations)
     //
@@ -292,6 +304,159 @@ public final class Chat {
         } else {
           System.out.println("ERROR: Missing <title>");
         }
+      }
+    });
+
+    // STATUS-UPDATE (status update)
+    //
+    // Add a command that will give users information on items they are following
+    //
+    panel.register("status-update", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        System.out.print("Status Updates!\n" + user.statusUpdate());
+      }
+    });
+
+    // U-FOLLOW (follow user)
+    //
+    // Add a command that will follow user activity when the user enters
+    // "u-follow" while on the user panel.
+    //
+    panel.register("u-follow", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        } else if (name.length() > 0) {
+          final UserContext userB = findUser(name);
+          if (user == null) {
+            System.out.format("ERROR: Failed to sign in as '%s'\n", name);
+          } else {
+            user.followUser(userB.user);
+          }
+        } else {
+          System.out.println("ERROR: Missing <username>");
+        }
+      }
+
+      // Find the first user with the given name and return a user context
+      // for that user. If no user is found, the function will return null.
+      private UserContext findUser(String name) {
+        for (final UserContext user : context.allUsers()) {
+          if (user.user.name.equals(name)) {
+            return user;
+          }
+        }
+        return null;
+      }
+    });
+
+    // U-UNFOLLOW (follow user)
+    //
+    // Add a command that will unfollow user activity when the user enters
+    // "u-unfollow" while on the user panel.
+    //
+    panel.register("u-unfollow", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        } else if (name.length() > 0) {
+          final UserContext userB = findUser(name);
+          if (user == null) {
+            System.out.format("ERROR: Failed to sign in as '%s'\n", name);
+          } else {
+            user.unfollowUser(userB.user);
+          }
+        } else {
+          System.out.println("ERROR: Missing <username>");
+        }
+      }
+
+      // Find the first user with the given name and return a user context
+      // for that user. If no user is found, the function will return null.
+      private UserContext findUser(String name) {
+        for (final UserContext user : context.allUsers()) {
+          if (user.user.name.equals(name)) {
+            return user;
+          }
+        }
+        return null;
+      }
+    });
+
+    // C-UNFOLLOW (unfollow conversation)
+    //
+    // Add a command that will unfollow a conversation when the user enters
+    // "c-unfollow" while on the user panel.
+    //
+    panel.register("c-unfollow", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
+          final ConversationContext conversation = find(name);
+          if (conversation == null) {
+            System.out.format("ERROR: No conversation with name '%s'\n", name);
+          } else {
+            user.unfollowConversation(conversation.conversation.id);
+          }
+        } else {
+          System.out.println("ERROR: Missing <title>");
+        }
+      }
+
+      // Find the first conversation with the given name and return its context.
+      // If no conversation has the given name, this will return null.
+      private ConversationContext find(String title) {
+        for (final ConversationContext conversation : user.conversations()) {
+          if (title.equals(conversation.conversation.title)) {
+            return conversation;
+          }
+        }
+        return null;
+      }
+    });
+
+    // C-FOLLOW (follow conversation)
+    //
+    // Add a command that will follow a conversation when the user enters
+    // "c-follow" while on the user panel.
+    //
+    panel.register("c-follow", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
+          final ConversationContext conversation = find(name);
+          if (conversation == null) {
+            System.out.format("ERROR: No conversation with name '%s'\n", name);
+          } else {
+            user.followConversation(conversation.conversation.id);
+          }
+        } else {
+          System.out.println("ERROR: Missing <title>");
+        }
+      }
+
+      // Find the first conversation with the given name and return its context.
+      // If no conversation has the given name, this will return null.
+      private ConversationContext find(String title) {
+        for (final ConversationContext conversation : user.conversations()) {
+          if (title.equals(conversation.conversation.title)) {
+            return conversation;
+          }
+        }
+        return null;
       }
     });
 
