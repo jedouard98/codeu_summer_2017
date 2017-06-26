@@ -53,14 +53,14 @@ public final class User {
   public final Uuid id;
   public final String name;
   public final Time creation;
-  public HashMap<Uuid, UserFollowing> following;
+  public HashMap<Uuid, UserFollowing> followees;
   public HashMap<Uuid, UserFollowing> followers;
 
   public User(Uuid id, String name, Time creation) {
     this.id = id;
     this.name = name;
     this.creation = creation;
-    this.following = new HashMap<Uuid, UserFollowing>();
+    this.followees = new HashMap<Uuid, UserFollowing>();
     this.followers = new HashMap<Uuid, UserFollowing>();
   }
 
