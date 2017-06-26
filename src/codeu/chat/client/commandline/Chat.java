@@ -263,8 +263,6 @@ public final class Chat {
       }
     });
 
-
-
     // C-LIST (list conversations)
     //
     // Add a command that will print all conversations when the user enters
@@ -309,12 +307,13 @@ public final class Chat {
 
     // STATUS-UPDATE (status update)
     //
-    // Add a command that will give users information on items they are following
+    // Add a command that will give users information on items they are following.
     //
     panel.register("status-update", new Panel.Command() {
       @Override
       public void invoke(Tokenizer args) {
-        System.out.print("Status Updates!\n" + user.statusUpdate());
+        System.out.println("Status Updates!");
+        System.out.print(user.statusUpdate())
       }
     });
 
@@ -330,23 +329,24 @@ public final class Chat {
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
         } else if (name.length() > 0) {
-          final UserContext userB = findUser(name);
+          final User userToBeFollowed = findUser(name);
           if (user == null) {
-            System.out.format("ERROR: Failed to sign in as '%s'\n", name);
+            System.out.format("ERROR: Failed to follow '%s'\n", name);
           } else {
-            user.followUser(userB.user);
+            user.followUser(userToBeFollowed);
           }
         } else {
           System.out.println("ERROR: Missing <username>");
         }
       }
+      // TODO: add this function to user context to avoid its duplication
 
       // Find the first user with the given name and return a user context
       // for that user. If no user is found, the function will return null.
-      private UserContext findUser(String name) {
-        for (final UserContext user : context.allUsers()) {
-          if (user.user.name.equals(name)) {
-            return user;
+      private User findUser(String name) {
+        for (final UserContext context : context.allUsers()) {
+          if (context.user.name.equals(name)) {
+            return user.user;
           }
         }
         return null;
@@ -365,11 +365,11 @@ public final class Chat {
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
         } else if (name.length() > 0) {
-          final UserContext userB = findUser(name);
+          final User userToBeFollowed = findUser(name);
           if (user == null) {
-            System.out.format("ERROR: Failed to sign in as '%s'\n", name);
+            System.out.format("ERROR: Failed to follow '%s'\n", name);
           } else {
-            user.unfollowUser(userB.user);
+            user.unfollowUser(userToBeFollowed);
           }
         } else {
           System.out.println("ERROR: Missing <username>");
@@ -378,10 +378,11 @@ public final class Chat {
 
       // Find the first user with the given name and return a user context
       // for that user. If no user is found, the function will return null.
-      private UserContext findUser(String name) {
-        for (final UserContext user : context.allUsers()) {
-          if (user.user.name.equals(name)) {
-            return user;
+      private User findUser(String name) {
+        // TODO: fix the round trip method for an efficient lookup method
+        for (final UserContext context : context.allUsers()) {
+          if (context.user.name.equals(name)) {
+            return user.user;
           }
         }
         return null;
@@ -401,11 +402,11 @@ public final class Chat {
           System.out.println("ERROR: Too many arguments for command");
         }
         else if (name.length() > 0) {
-          final ConversationContext conversation = find(name);
+          final Uuid conversationID = find(name);
           if (conversation == null) {
             System.out.format("ERROR: No conversation with name '%s'\n", name);
           } else {
-            user.unfollowConversation(conversation.conversation.id);
+            user.unfollowConversation(conversationID);
           }
         } else {
           System.out.println("ERROR: Missing <title>");
@@ -414,10 +415,10 @@ public final class Chat {
 
       // Find the first conversation with the given name and return its context.
       // If no conversation has the given name, this will return null.
-      private ConversationContext find(String title) {
-        for (final ConversationContext conversation : user.conversations()) {
-          if (title.equals(conversation.conversation.title)) {
-            return conversation;
+      private Uuid find(String title) {
+        for (final ConversationContext context : user.conversations()) {
+          if (title.equals(context.conversation.title)) {
+            return context.conversation.id;
           }
         }
         return null;
@@ -430,6 +431,7 @@ public final class Chat {
     // "c-follow" while on the user panel.
     //
     panel.register("c-follow", new Panel.Command() {
+      // TODO: add function to conversation to remove needed paramenter
       @Override
       public void invoke(Tokenizer args) {
         final String name = args.hasNext() ? args.next().trim() : "";
@@ -437,11 +439,11 @@ public final class Chat {
           System.out.println("ERROR: Too many arguments for command");
         }
         else if (name.length() > 0) {
-          final ConversationContext conversation = find(name);
+          final Uuid conversationID = find(name);
           if (conversation == null) {
             System.out.format("ERROR: No conversation with name '%s'\n", name);
           } else {
-            user.followConversation(conversation.conversation.id);
+            user.followConversation(conversationID);
           }
         } else {
           System.out.println("ERROR: Missing <title>");
@@ -450,10 +452,10 @@ public final class Chat {
 
       // Find the first conversation with the given name and return its context.
       // If no conversation has the given name, this will return null.
-      private ConversationContext find(String title) {
-        for (final ConversationContext conversation : user.conversations()) {
-          if (title.equals(conversation.conversation.title)) {
-            return conversation;
+      private Uuid find(String title) {
+        for (final ConversationContext context : user.conversations()) {
+          if (title.equals(context.conversation.title)) {
+            return context.conversation.id;
           }
         }
         return null;
