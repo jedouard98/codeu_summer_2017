@@ -137,6 +137,20 @@ public final class Timeline {
     scheduleAt(System.currentTimeMillis(), callback);
   }
 
+  // SCHEDULE RECURRING
+  //
+  // Add an event to the timeline so that it will occur in approximately in a
+  // set amount of milliseconds continuously
+  public void scheduleRecurring(long ms, Runnable callback) {
+    scheduleAt(System.currentTimeMillis(), callback);
+    scheduleAt(System.currentTimeMillis() + ms, new Runnable() {
+      @Override
+      public void run() {
+        scheduleRecurring(ms, callback);
+      }
+    });
+  }
+
   // SCHEDULE IN
   //
   // Add an event to the timeline so that it will occur in approximately in a

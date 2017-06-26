@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.time.Duration;
 
 import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.ConversationPayload;
@@ -46,9 +47,12 @@ public final class Server {
     void onMessage(InputStream in, OutputStream out) throws IOException;
   }
 
+  public static TransactionLog transactions;
+
   private static final Logger.Log LOG = Logger.newLog(Server.class);
 
-  private static final int RELAY_REFRESH_MS = 5000;  // 5 seconds
+  private static final Duration RELAY_REFRESH = Duration.ofSeconds(5);
+  private static final Duration TRANS_REFRESH = Duration.ofSeconds(25);  // 25 seconds
 
   private final Timeline timeline = new Timeline();
 
@@ -61,6 +65,8 @@ public final class Server {
   private final View view = new View(model);
   private final Controller controller;
 
+  private static final String FILE_NAME = "transactions.txt";
+
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
@@ -70,6 +76,14 @@ public final class Server {
     this.secret = secret;
     this.controller = new Controller(id, model);
     this.relay = relay;
+
+    this.transactions = new TransactionLog(controller, FILE_NAME);
+    try {
+      this.transactions.read();
+    }
+    catch(IOException e) {
+      LOG.info("Transactions file does not exist.");
+    }
 
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
@@ -84,6 +98,8 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_MESSAGE_RESPONSE);
         Serializers.nullable(Message.SERIALIZER).write(out, message);
+
+        transactions.writeCreateMessage(message, conversation);
 
         timeline.scheduleNow(createSendToRelayEvent(
             author,
@@ -102,6 +118,8 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_USER_RESPONSE);
         Serializers.nullable(User.SERIALIZER).write(out, user);
+
+        transactions.writeCreateUser(user);
       }
     });
 
@@ -116,6 +134,8 @@ public final class Server {
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_CONVERSATION_RESPONSE);
         Serializers.nullable(ConversationHeader.SERIALIZER).write(out, conversation);
+
+        transactions.writeCreateConversation(conversation);
       }
     });
 
@@ -125,7 +145,6 @@ public final class Server {
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
         long uptime = view.getUptime();
-
         Serializers.INTEGER.write(out, NetworkCode.GET_SERVER_UPTIME_RESPONSE);
         Serializers.LONG.write(out, uptime);
       }
@@ -196,11 +215,18 @@ public final class Server {
       }
     });
 
-    this.timeline.scheduleNow(new Runnable() {
+    this.timeline.scheduleRecurring(TRANS_REFRESH.toMillis(), new Runnable() {
+      @Override
+      public void run() {
+        LOG.info("Flushing server info to disc...");
+        transactions.flush();
+      }
+    });
+
+    this.timeline.scheduleRecurring(RELAY_REFRESH.toMillis(), new Runnable() {
       @Override
       public void run() {
         try {
-
           LOG.info("Reading update from relay...");
 
           for (final Relay.Bundle bundle : relay.read(id, secret, lastSeen, 32)) {
@@ -213,7 +239,6 @@ public final class Server {
           LOG.error(ex, "Failed to read update from relay.");
 
         }
-        timeline.scheduleIn(RELAY_REFRESH_MS, this);
       }
     });
   }
