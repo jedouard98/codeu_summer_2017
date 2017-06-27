@@ -54,7 +54,6 @@ public final class ConversationHeader {
   public final Uuid owner;
   public final Time creation;
   public final String title;
-  public int size;
 
   public ConversationHeader(Uuid id, Uuid owner, Time creation, String title) {
 
@@ -62,7 +61,6 @@ public final class ConversationHeader {
     this.owner = owner;
     this.creation = creation;
     this.title = title;
-    this.size = 0;
 
   }
 }
