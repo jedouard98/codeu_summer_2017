@@ -80,7 +80,7 @@ public final class BasicControllerTest {
   public void testGetVersion() {
 
     assertFalse("ERROR: Exception during call on server. Check log for details.", model == null);
-    String str = model.Version();
+    String str = model.version();
     assertNotNull(str);
   }
 
@@ -90,11 +90,11 @@ public final class BasicControllerTest {
   @Test
   public void testUpTime() {
 
-    model.Uptime();
+    model.uptime();
     final long l = 0;
 
     assertFalse("Response from server failed.", model == null);
-    assertTrue(model.Uptime() >= l);
+    assertTrue(model.uptime() >= l);
 
   }
 
