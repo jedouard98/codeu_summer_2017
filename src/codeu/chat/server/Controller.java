@@ -40,6 +40,31 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
+  public String newStatusUpdate(Uuid user) {
+    return model.statusUpdate(user);
+  }
+
+  @Override
+  public void followUser(User userA, User userB) {
+    model.followUser(userA, userB);
+  }
+
+  @Override
+  public void unfollowUser(User userA, User userB) {
+    model.unfollowUser(userA, userB);
+  }
+
+  @Override
+  public void unfollowConversation(Uuid user, Uuid conversation) {
+    model.unfollowConversation(user, conversation);
+  }
+
+  @Override
+  public void followConversation(Uuid user, Uuid conversation) {
+    model.followConversation(user, conversation);
+  }
+
+  @Override
   public Message newMessage(Uuid author, Uuid conversation, String body) {
     return newMessage(createId(), author, conversation, body, Time.now());
   }
@@ -56,6 +81,7 @@ public final class Controller implements RawController, BasicController {
 
   @Override
   public Message newMessage(Uuid id, Uuid author, Uuid conversation, String body, Time creationTime) {
+    model.conversationById().first(conversation).size++;
 
     final User foundUser = model.userById().first(author);
     final ConversationPayload foundConversation = model.conversationPayloadById().first(conversation);
@@ -136,7 +162,7 @@ public final class Controller implements RawController, BasicController {
 
     if (foundOwner != null && isIdFree(id)) {
       conversation = new ConversationHeader(id, owner, creationTime, title);
-      model.add(conversation);
+      model.add(foundOwner, conversation);
       LOG.info("Conversation added: " + id);
     }
 

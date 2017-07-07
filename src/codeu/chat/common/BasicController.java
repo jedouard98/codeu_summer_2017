@@ -15,6 +15,7 @@
 package codeu.chat.common;
 
 import codeu.chat.util.Uuid;
+import codeu.chat.common.User;
 
 // BASIC CONTROLLER
 //
@@ -24,6 +25,45 @@ import codeu.chat.util.Uuid;
 //   should be treated as read only data as manipulating any data returned
 //   from the controller may have no effect on the server's state.
 public interface BasicController {
+  // UNFOLLOW USER
+  //
+  //   Removes an established relationship between a user and another user.
+  //   All parameters must be provided or else the server won't apply the change.
+  //   If the operation is successful, the server will now have an update on
+  //   the relationship between the user and provided secondary user
+  void unfollowUser(User userA, User userB);
+
+  // FOLLOW USER
+  //
+  //   Creates an established relationship between a user and another user.
+  //   All parameters must be provided or else the server won't apply the change.
+  //   If the operation is successful, the server will now have an update on
+  //   the relationship between the user and provided secondary user
+  void followUser(User userA, User userB);
+
+  //  NEW STATUS UPDATE
+  //
+  //   Creates an update that provides the user with information about their
+  //   followed items. All parameters must be provided or else the server won't
+  //   apply the change.  If the operation is successful, a String object will be
+  //   returned representing the full state of the user's status on the server
+  String newStatusUpdate(Uuid user);
+
+  // UNFOLLOW CONVERSATION
+  //
+  //   Removes an established relationship between a user and a conversation.
+  //   All parameters must be provided or else the server won't apply the change.
+  //   If the operation is successful, the server will now have an update on
+  //   the relationship between the user and provided conversation
+  void unfollowConversation(Uuid user, Uuid conversation);
+
+  // FOLLOW CONVERSATION
+  //
+  //   Creates an established relationship between a user and a conversation.
+  //   All parameters must be provided or else the server won't apply the change.
+  //   If the operation is successful, the server will now have an update on
+  //   the relationship between the user and provided conversation
+  void followConversation(Uuid user, Uuid conversation);
 
   // NEW MESSAGE
   //
