@@ -86,10 +86,10 @@ final class ServerMain {
     }
   }
 
-  private static void runServer(Uuid id,
+  private static void runServer (Uuid id,
                                 Secret secret,
                                 ConnectionSource serverSource,
-                                ConnectionSource relaySource) {
+                                ConnectionSource relaySource) throws IOException {
 
     final Relay relay = relaySource == null ?
                         new NoOpRelay() :
