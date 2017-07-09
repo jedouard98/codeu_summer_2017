@@ -16,6 +16,8 @@
 package codeu.chat;
 
 import java.io.IOException;
+import java.lang.InterruptedException;
+
 import java.io.File;
 
 import codeu.chat.common.Relay;
@@ -35,7 +37,7 @@ final class ServerMain {
 
   private static final Logger.Log LOG = Logger.newLog(ServerMain.class);
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException, InterruptedException {
 
     Logger.enableConsoleOutput();
 
@@ -89,7 +91,7 @@ final class ServerMain {
   private static void runServer (Uuid id,
                                 Secret secret,
                                 ConnectionSource serverSource,
-                                ConnectionSource relaySource) throws IOException {
+                                ConnectionSource relaySource) throws IOException, InterruptedException {
 
     final Relay relay = relaySource == null ?
                         new NoOpRelay() :
