@@ -17,7 +17,7 @@ import java.io.FileReader;
 import java.io.File;
 
 import java.io.IOException;
-
+import java.lang.InterruptedException;
 
 public final class TransactionLog {
 
@@ -87,18 +87,15 @@ public final class TransactionLog {
   }
 
   // takes all items and flushes it to disc format!
-  public void flush() {
-    try{
-      FileWriter writer = new FileWriter("transactions.txt", true);
-      for (String transaction : transactionsList)
-        writer.write(transaction + "\n");
-      writer.flush();
-    } catch (IOException e) {
-    }
+  public void flush() throws IOException {
+    FileWriter writer = new FileWriter("transactions.txt", true);
+    for (String transaction : transactionsList)
+      writer.write(transaction + "\n");
+    writer.flush();
     this.transactionsList.clear();
   }
 
-  public void writeCreateUser(User user) {
+  public void writeCreateUser(User user) throws InterruptedException {
     String command = "CREATEUSER";
 
     String uuid = user.id.toString();
@@ -106,12 +103,11 @@ public final class TransactionLog {
     long creation = user.creation.inMs();
 
     String transaction = String.format("Command: %s Uuid: %s Name: \"%s\" Creation: %d", command, uuid, name, creation);
-    try {
-      transactionsList.put(transaction);
-    } catch (Exception e) {}
+
+    transactionsList.put(transaction);
   }
 
-  public void writeCreateConversation(ConversationHeader conversation) {
+  public void writeCreateConversation(ConversationHeader conversation) throws InterruptedException {
     String command = "CREATECONVO";
 
     String uuid = conversation.id.toString();
@@ -120,12 +116,11 @@ public final class TransactionLog {
     String title = conversation.title;
 
     String transaction = String.format("Command: %s Uuid: %s Owner: %s Creation: %d Title: \"%s\"", command, uuid, owner, creation, title);
-    try {
-      transactionsList.put(transaction);
-    } catch (Exception e) {}
+
+    transactionsList.put(transaction);
   }
 
-  public void writeCreateMessage(Message message, Uuid conversation) {
+  public void writeCreateMessage(Message message, Uuid conversation) throws InterruptedException{
     String command = "CREATEMESSAGE";
 
     String uuid = message.id.toString();
@@ -135,18 +130,17 @@ public final class TransactionLog {
     long creation = message.creation.inMs();
 
     String transaction = String.format("Command: %s Uuid: %s Author: %s Conversation: %s Body: \"%s\" Creation: %d", command, uuid, author, convo, body, creation);
-    try {
-      transactionsList.put(transaction);
-    } catch (Exception e) {}
+
+    transactionsList.put(transaction);
   }
 
   // collects users and establishes a following
-  public void writeFollowUser(User user1, User user2) {
+  public void writeFollowUser(User user1, User user2) throws InterruptedException{
     // TODO: implement thiss
   }
 
   // collects users and establishes a following
-  public void writeFollowConvo(User user1, ConversationHeader convo) {
+  public void writeFollowConvo(User user1, ConversationHeader convo) throws InterruptedException{
     // TODO: implement this
   }
 
