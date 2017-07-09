@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.time.Duration;
 
+import java.lang.InterruptedException;
+
 import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.ConversationPayload;
 import codeu.chat.common.LinearUuidGenerator;
@@ -44,7 +46,7 @@ import codeu.chat.util.connections.Connection;
 public final class Server {
 
   private interface Command {
-    void onMessage(InputStream in, OutputStream out) throws IOException;
+    void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException;
   }
 
   public static TransactionLog transactions;
@@ -70,7 +72,7 @@ public final class Server {
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
-  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException {
+  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException, InterruptedException {
 
     this.id = id;
     this.secret = secret;
@@ -159,7 +161,7 @@ public final class Server {
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final Uuid author = Uuid.SERIALIZER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
@@ -182,7 +184,7 @@ public final class Server {
     // New User - A client wants to add a new user to the back end.
     this.commands.put(NetworkCode.NEW_USER_REQUEST,  new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final String name = Serializers.STRING.read(in);
         final User user = controller.newUser(name);
@@ -197,7 +199,7 @@ public final class Server {
     // New Conversation - A client wants to add a new conversation to the back end.
     this.commands.put(NetworkCode.NEW_CONVERSATION_REQUEST,  new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final String title = Serializers.STRING.read(in);
         final Uuid owner = Uuid.SERIALIZER.read(in);
@@ -291,7 +293,13 @@ public final class Server {
       @Override
       public void run() {
         LOG.info("Flushing server info to disc...");
-        transactions.flush();
+
+        try {
+          transactions.flush();
+        } catch (IOException ex) {
+          Thread t = Thread.currentThread();
+          t.getUncaughtExceptionHandler().uncaughtException(t, ex);
+        }
       }
     });
 
