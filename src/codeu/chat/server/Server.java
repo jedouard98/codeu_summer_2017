@@ -70,13 +70,13 @@ public final class Server {
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
-  public Server(final Uuid id, final Secret secret, final Relay relay) {
+  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException {
 
     this.id = id;
     this.secret = secret;
     this.controller = new Controller(id, model);
     this.relay = relay;
-    
+
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
       @Override
@@ -151,14 +151,10 @@ public final class Server {
       }
 
     });
-    
+
     this.transactions = new TransactionLog(controller, FILE_NAME);
-    try {
-      this.transactions.read();
-    }
-    catch(IOException e) {
-      LOG.info("Transactions file does not exist.");
-    }
+
+    this.transactions.read();
 
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
