@@ -332,16 +332,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
-        } else if (name.length() > 0) {
-          final User userToBeFollowed = findUser(name);
-          if (user == null) {
-            System.out.format("ERROR: Failed to follow '%s'\n", name);
-          } else {
-            user.followUser(userToBeFollowed);
-          }
-        } else {
-          System.out.println("ERROR: Missing <username>");
+          return;
         }
+        else if (name.length() < 0) {
+          System.out.println("ERROR: Missing <username>");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to follow '%s'\n", name);
+          return;
+        }
+
+        final User userToBeFollowed = findUser(name);
+        user.followUser(userToBeFollowed);
       }
       // TODO: add this function to user context to avoid its duplication
 
@@ -368,16 +371,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
-        } else if (name.length() > 0) {
-          final User userToBeFollowed = findUser(name);
-          if (user == null) {
-            System.out.format("ERROR: Failed to follow '%s'\n", name);
-          } else {
-            user.unfollowUser(userToBeFollowed);
-          }
-        } else {
-          System.out.println("ERROR: Missing <username>");
+          return;
         }
+        else if (name.length() < 0) {
+          System.out.println("ERROR: Missing <username>");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to follow '%s'\n", name);
+          return;
+        }
+
+        final User userToBeUnfollowed = findUser(name);
+        user.followUser(userToBeUnfollowed);
       }
 
       // Find the first user with the given name and return a user context
@@ -404,17 +410,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
+          return;
         }
-        else if (name.length() > 0) {
-          final Uuid conversationID = find(name);
-          if (conversationID == null) {
-            System.out.format("ERROR: No conversation with name '%s'\n", name);
-          } else {
-            user.unfollowConversation(conversationID);
-          }
-        } else {
+        else if (name.length() < 0) {
           System.out.println("ERROR: Missing <title>");
+          return;
         }
+        else if (find(name) == null) {
+          System.out.format("ERROR: No conversation with name '%s'\n", name);
+          return;
+        }
+
+        final Uuid conversationID = find(name);
+        user.unfollowConversation(conversationID);
       }
 
       // Find the first conversation with the given name and return its context.
@@ -441,17 +449,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
+          return;
         }
-        else if (name.length() > 0) {
-          final Uuid conversationID = find(name);
-          if (conversationID == null) {
-            System.out.format("ERROR: No conversation with name '%s'\n", name);
-          } else {
-            user.followConversation(conversationID);
-          }
-        } else {
+        else if (name.length() < 0) {
           System.out.println("ERROR: Missing <title>");
+          return;
         }
+        else if (find(name) == null) {
+          System.out.format("ERROR: No conversation with name '%s'\n", name);
+          return;
+        }
+
+        final Uuid conversationID = find(name);
+        user.followConversation(conversationID);
       }
 
       // Find the first conversation with the given name and return its context.
