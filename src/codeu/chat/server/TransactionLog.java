@@ -14,6 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.FileReader;
+import java.io.File;
 
 import java.io.IOException;
 
@@ -31,17 +32,19 @@ public final class TransactionLog {
 
   // takes in information that the server needs to populate itself!
   public void read() throws IOException {
-    // TODO:  check for file existence before reading
-    FileReader transactions = new FileReader(fileName);
-    String line = null;
-    BufferedReader in = new BufferedReader(transactions);
-    while ((line = in.readLine()) != null) {
-      Tokenizer tokens = new Tokenizer(line);
-      tokens.next();
-      switch (tokens.next()) {
-        case "CREATEUSER" : readUser(tokens); break;
-        case "CREATEMESSAGE" : readMessage(tokens); break;
-        case "CREATECONVO" : readConvo(tokens); break;
+    File file = new File(fileName);
+    if (file.exists()) {
+      FileReader transactions = new FileReader(file);
+      String line = null;
+      BufferedReader in = new BufferedReader(transactions);
+      while ((line = in.readLine()) != null) {
+        Tokenizer tokens = new Tokenizer(line);
+        tokens.next();
+        switch (tokens.next()) {
+          case "CREATEUSER" : readUser(tokens); break;
+          case "CREATEMESSAGE" : readMessage(tokens); break;
+          case "CREATECONVO" : readConvo(tokens); break;
+        }
       }
     }
   }
@@ -143,7 +146,7 @@ public final class TransactionLog {
   }
 
   // collects users and establishes a following
-  public void writewriteFollowConvo(User user1, ConversationHeader convo) {
+  public void writeFollowConvo(User user1, ConversationHeader convo) {
     // TODO: implement this
   }
 
