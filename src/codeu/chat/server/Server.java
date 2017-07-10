@@ -79,6 +79,10 @@ public final class Server {
     this.controller = new Controller(id, model);
     this.relay = relay;
 
+    this.transactions = new TransactionLog(controller, FILE_NAME, model);
+
+    this.transactions.read();
+
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
       @Override
@@ -96,7 +100,7 @@ public final class Server {
     // New Unfollow User  - A client wants to unfollow a user
     this.commands.put(NetworkCode.NEW_UNFOLLOW_USER_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException{
 
         final User userA = User.SERIALIZER.read(in);
         final User userB = User.SERIALIZER.read(in);
@@ -104,14 +108,14 @@ public final class Server {
         controller.unfollowUser(userA, userB);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_UNFOLLOW_USER_RESPONSE);
+        transactions.writeUnfollowUser(userA, userB);
       }
-
     });
 
     // New Follow User  - A client wants to follow a user
     this.commands.put(NetworkCode.NEW_FOLLOW_USER_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final User userA = User.SERIALIZER.read(in);
         final User userB = User.SERIALIZER.read(in);
@@ -119,15 +123,15 @@ public final class Server {
         controller.followUser(userA, userB);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_FOLLOW_USER_RESPONSE);
+        transactions.writeFollowUser(userA, userB);
       }
-
     });
 
 
     // New Unfollow Conversation  - A client wants to unfollow a conversation.
     this.commands.put(NetworkCode.NEW_UNFOLLOW_CONVERSATION_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final Uuid user = Uuid.SERIALIZER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
@@ -135,14 +139,14 @@ public final class Server {
         controller.unfollowConversation(user, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_UNFOLLOW_CONVERSATION_RESPONSE);
+        transactions.writeUnfollowConvo(user, conversation);
       }
-
     });
 
     // New Follow Conversation  - A client wants to add a follow a conversation.
     this.commands.put(NetworkCode.NEW_FOLLOW_CONVERSATION_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final Uuid user = Uuid.SERIALIZER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
@@ -150,13 +154,11 @@ public final class Server {
         controller.followConversation(user, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_FOLLOW_CONVERSATION_RESPONSE);
+
+        transactions.writeFollowConvo(user, conversation);
       }
 
     });
-
-    this.transactions = new TransactionLog(controller, FILE_NAME);
-
-    this.transactions.read();
 
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
