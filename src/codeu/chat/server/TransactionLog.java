@@ -25,9 +25,12 @@ public final class TransactionLog {
   private Controller controller;
   private String fileName;
 
-  public TransactionLog(Controller controller, String fileName) {
+  private final Model model;
+
+  public TransactionLog(Controller controller, String fileName, Model model) {
     this.controller = controller;
     this.fileName = fileName;
+    this.model = model;
   }
 
   // takes in information that the server needs to populate itself!
@@ -44,9 +47,53 @@ public final class TransactionLog {
           case "CREATEUSER" : readUser(tokens); break;
           case "CREATEMESSAGE" : readMessage(tokens); break;
           case "CREATECONVO" : readConvo(tokens); break;
+          case "FOLLOWCONVO" : readFollowConvo(tokens); break;
+          case "FOLLOWUSER" : readFollowUser(tokens); break;
+          case "UNFOLLOWCONVO" : readUnfollowConvo(tokens); break;
+          case "UNFOLLOWUSER" : readUnfollowUser(tokens); break;
         }
       }
     }
+  }
+
+  private void readUnfollowUser(Tokenizer tokens) throws IOException {
+    tokens.next();
+    Uuid userUnfollowingUuid = Uuid.parse(tokens.next());
+    User userUnfollowing = model.userById().first(userUnfollowingUuid);
+    tokens.next();
+    Uuid userToBeUnfollowedUuid = Uuid.parse(tokens.next());
+    User userToBeUnfollowed = model.userById().first(userToBeUnfollowedUuid);
+
+    controller.unfollowUser(userUnfollowing, userToBeUnfollowed);
+  }
+
+  private void readFollowUser(Tokenizer tokens) throws IOException {
+    tokens.next();
+    Uuid userFollowingUuid = Uuid.parse(tokens.next());
+    User userFollowing = model.userById().first(userFollowingUuid);
+    tokens.next();
+    Uuid userToBeFollowedUuid = Uuid.parse(tokens.next());
+    User userToBeFollowed = model.userById().first(userToBeFollowedUuid);
+
+    controller.followUser(userFollowing, userToBeFollowed);
+  }
+
+  private void readUnfollowConvo(Tokenizer tokens) throws IOException {
+    tokens.next();
+    Uuid userUuid = Uuid.parse(tokens.next());
+    tokens.next();
+    Uuid convoUuid = Uuid.parse(tokens.next());
+
+    controller.unfollowConversation(userUuid, convoUuid);
+  }
+
+  private void readFollowConvo(Tokenizer tokens) throws IOException {
+    tokens.next();
+    Uuid userUuid = Uuid.parse(tokens.next());
+    tokens.next();
+    Uuid convoUuid = Uuid.parse(tokens.next());
+
+    controller.followConversation(userUuid, convoUuid);
   }
 
   private void readUser(Tokenizer tokens) throws IOException {
@@ -120,7 +167,7 @@ public final class TransactionLog {
     transactionsList.put(transaction);
   }
 
-  public void writeCreateMessage(Message message, Uuid conversation) throws InterruptedException{
+  public void writeCreateMessage(Message message, Uuid conversation) throws InterruptedException {
     String command = "CREATEMESSAGE";
 
     String uuid = message.id.toString();
@@ -135,13 +182,50 @@ public final class TransactionLog {
   }
 
   // collects users and establishes a following
-  public void writeFollowUser(User user1, User user2) throws InterruptedException{
-    // TODO: implement thiss
+  public void writeFollowUser(User userFollowing, User userToBeFollowed) throws InterruptedException {
+    String command = "FOLLOWUSER";
+
+    String userFollowingUuid = userFollowing.id.toString();
+    String userToBeFollowedUuid = userToBeFollowed.id.toString();
+
+    String transaction = String.format("Command: %s UserFollowingUuid: %s userToBeFollowedUuid: %s", command, userFollowingUuid, userToBeFollowedUuid);
+
+    transactionsList.put(transaction);
   }
 
-  // collects users and establishes a following
-  public void writeFollowConvo(User user1, ConversationHeader convo) throws InterruptedException{
-    // TODO: implement this
+  // collects users and establishes an unfollowing
+  public void writeUnfollowUser(User userUnfollowing, User userToBeUnfollowed) throws InterruptedException {
+    String command = "UNFOLLOWUSER";
+
+    String userUnfollowingUuid = userUnfollowing.id.toString();
+    String userToBeUnfollowedUuid = userToBeUnfollowed.id.toString();
+
+    String transaction = String.format("Command: %s UserUnfollowingUuid: %s userToBeUnfollowedUuid: %s", command, userUnfollowingUuid, userToBeUnfollowedUuid);
+
+    transactionsList.put(transaction);
   }
 
+  // collects users and conversations and establishes a following
+  public void writeFollowConvo(Uuid user, Uuid convo) throws InterruptedException {
+    String command = "FOLLOWCONVO";
+
+    String userUuid = user.toString();
+    String conversationUuid = convo.toString();
+
+    String transaction = String.format("Command: %s User: %s Conversation: %s", command, userUuid, conversationUuid);
+
+    transactionsList.put(transaction);
+  }
+
+    // collects users and conversations and establishes an unfollowing
+  public void writeUnfollowConvo(Uuid user, Uuid convo) throws InterruptedException {
+    String command = "UNFOLLOWCONVO";
+
+    String userUuid = user.toString();
+    String conversationUuid = convo.toString();
+
+    String transaction = String.format("Command: %s User: %s Conversation: %s", command, userUuid, conversationUuid);
+
+    transactionsList.put(transaction);
+  }
 }
