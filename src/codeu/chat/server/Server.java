@@ -76,7 +76,7 @@ public final class Server {
     this.secret = secret;
     this.controller = new Controller(id, model);
     this.relay = relay;
-    
+
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
       @Override
@@ -113,7 +113,7 @@ public final class Server {
 
         final User userA = User.SERIALIZER.read(in);
         final User userB = User.SERIALIZER.read(in);
-
+        
         controller.followUser(userA, userB);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_FOLLOW_USER_RESPONSE);
@@ -151,7 +151,7 @@ public final class Server {
       }
 
     });
-    
+
     this.transactions = new TransactionLog(controller, FILE_NAME);
     try {
       this.transactions.read();

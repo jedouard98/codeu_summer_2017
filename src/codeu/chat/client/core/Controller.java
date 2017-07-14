@@ -85,6 +85,8 @@ final class Controller implements BasicController {
       Serializers.INTEGER.write(connection.out(), NetworkCode.NEW_FOLLOW_USER_REQUEST);
       User.SERIALIZER.write(connection.out(), userFollowing);
       User.SERIALIZER.write(connection.out(), userToBeFollowed);
+      System.out.println("core: " + userFollowing);
+      System.out.println("core: " + userToBeFollowed);
 
       if (!(Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_FOLLOW_CONVERSATION_RESPONSE)) {
         LOG.error("Response from server failed.");
@@ -94,7 +96,7 @@ final class Controller implements BasicController {
       LOG.error(ex, "Exception during call on server.");
     }
   }
-  
+
   @Override
   public void unfollowConversation(Uuid user, Uuid conversation) {
     try (final Connection connection = source.connect()) {

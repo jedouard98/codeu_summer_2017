@@ -104,9 +104,10 @@ public final class Model {
   }
 
   public void followUser(User userA, User userB) {
-    User user1 = userById().first(userA.id);
-    User user2 = userById().first(userB.id);
-    User.follow(user1, user2);
+    // User user1 = userById().first(userA.id);
+    // User user2 = userById().first(userB.id);
+    // User.follow(user1, user2);
+    userA.follow(userB);
   }
 
   public void unfollowConversation(Uuid user, Uuid conversation) {

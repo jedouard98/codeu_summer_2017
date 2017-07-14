@@ -25,6 +25,9 @@ import codeu.chat.client.core.UserContext;
 
 import codeu.chat.util.Tokenizer;
 import codeu.chat.util.Time;
+import codeu.chat.util.Uuid;
+
+import codeu.chat.common.User;
 
 public final class Chat {
 
@@ -313,7 +316,7 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         System.out.println("Status Updates!");
-        System.out.print(user.statusUpdate())
+        System.out.print(user.statusUpdate());
       }
     });
 
@@ -346,7 +349,7 @@ public final class Chat {
       private User findUser(String name) {
         for (final UserContext context : context.allUsers()) {
           if (context.user.name.equals(name)) {
-            return user.user;
+            return context.user;
           }
         }
         return null;
@@ -403,7 +406,7 @@ public final class Chat {
         }
         else if (name.length() > 0) {
           final Uuid conversationID = find(name);
-          if (conversation == null) {
+          if (conversationID == null) {
             System.out.format("ERROR: No conversation with name '%s'\n", name);
           } else {
             user.unfollowConversation(conversationID);
@@ -440,7 +443,7 @@ public final class Chat {
         }
         else if (name.length() > 0) {
           final Uuid conversationID = find(name);
-          if (conversation == null) {
+          if (conversationID == null) {
             System.out.format("ERROR: No conversation with name '%s'\n", name);
           } else {
             user.followConversation(conversationID);

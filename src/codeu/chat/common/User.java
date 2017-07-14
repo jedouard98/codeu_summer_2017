@@ -66,21 +66,36 @@ public final class User {
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    for (Uuid user : following.keySet())
-      status.append(following.get(user).statusUpdate());
+    System.out.println("HERE! -------------------------" + followees.size());
+    System.out.println("HERE! -------------------------" + followers.size());
+    System.out.println(this);
+    for (Uuid user : followees.keySet()){
+      status.append(followees.get(user).statusUpdate());
+    }
     return status.toString();
   }
 
+  // // User A wants to follow User B
+  // public static void follow(User userA, User userB) {
+  //   UserFollowing connection = new UserFollowing(userA, userB);
+  //   System.out.println("HERE! -------------------------" + userA.followees.size());
+  //   System.out.println(userA);
+  //   System.out.println(userB);
+  //   userA.followees.put(userB.id, connection);
+  //   userB.followers.put(userA.id, connection);
+  //   System.out.println("AFTER! -------------------------" + userA.followees.size());
+  // }
+
   // User A wants to follow User B
-  public static void follow(User userA, User userB) {
-    UserFollowing connection = new UserFollowing(userA, userB);
-    userA.following.put(userB.id, connection);
-    userB.followers.put(userA.id, connection);
+  public void follow(User userB) {
+    UserFollowing connection = new UserFollowing(this, userB);
+    followees.put(userB.id, connection);
+    userB.followers.put(this.id, connection);
   }
 
   // User A wants to unfollow User B
   public static void unfollow(User userA, User userB) {
-    userA.following.remove(userB.id);
+    userA.followees.remove(userB.id);
     userB.followers.remove(userA.id);
   }
 
@@ -92,5 +107,9 @@ public final class User {
   public void addJoinedConversation(ConversationHeader conversation) {
     for (Uuid user : followers.keySet())
       followers.get(user).addJoinedConversation(conversation);
+  }
+
+  public String toString(){
+    return name;
   }
 }
