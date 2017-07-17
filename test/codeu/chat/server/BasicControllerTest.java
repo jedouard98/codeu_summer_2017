@@ -127,4 +127,18 @@ public final class BasicControllerTest {
     assertEquals("how are you", t2.next());
     assertFalse(t2.hasNext());
   }
+  
+  public void testFollowUser() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    
+    assertFalse("ERROR: Failed to follow user");
+  }
+  
+  public void testFollowConvo() {
+    final User user = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    
+    assertFalse("ERROR: Failed to follow convo");
+  }
 }
