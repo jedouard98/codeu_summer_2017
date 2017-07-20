@@ -51,9 +51,19 @@ public final class TransactionLog {
           case "FOLLOWUSER" : readFollowUser(tokens); break;
           case "UNFOLLOWCONVO" : readUnfollowConvo(tokens); break;
           case "UNFOLLOWUSER" : readUnfollowUser(tokens); break;
+          case "CREATESTATUSUPDATE" : readStatusUpdate(tokens); break;
         }
       }
     }
+  }
+
+  private void readStatusUpdate(Tokenizer tokens) throws IOException {
+    tokens.next();
+    Uuid userUuid = Uuid.parse(tokens.next());
+    User user = model.userById().first(userUuid);
+
+    controller.newStatusUpdate(userUuid);
+    System.out.println("I did a thing!!!");
   }
 
   private void readUnfollowUser(Tokenizer tokens) throws IOException {
@@ -140,6 +150,15 @@ public final class TransactionLog {
       writer.write(transaction + "\n");
     writer.flush();
     this.transactionsList.clear();
+  }
+
+  public void writeStatusUpdate(Uuid user) throws InterruptedException {
+    String command = "CREATESTATUSUPDATE";
+    String uuid = user.toString();
+    String transaction = String.format("Command: %s Uuid: %s", command, uuid);
+
+    transactionsList.put(transaction);
+    System.out.println("I did a thing!!!");
   }
 
   public void writeCreateUser(User user) throws InterruptedException {
