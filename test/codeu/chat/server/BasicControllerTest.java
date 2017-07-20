@@ -132,6 +132,7 @@ public final class BasicControllerTest {
     final User user = controller.newUser("user");
     final User user1 = controller.newUser("user");
     
+    User.follow(user, user1);
     assertFalse("ERROR: Failed to follow user");
   }
   
@@ -139,6 +140,17 @@ public final class BasicControllerTest {
     final User user = controller.newUser("user");
     final Conversation convo1 = controller.newConversation("convo");
     
+    User.follow(user, convo1);
     assertFalse("ERROR: Failed to follow convo");
   }
+  
+  public void testPersistentStorage() {
+    TransactionLog tl = new TransactionLog(controller, "test", model);
+    final User u = controller.newUser("tester");
+    tl.writeCreateUser(u);
+    tl.flush();
+    File f = new File("test");
+    Scanner s = new Scanner(f);
+    
+    assertTrue(s.hasNext());
 }
