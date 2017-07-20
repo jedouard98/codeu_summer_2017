@@ -353,7 +353,7 @@ public final class Chat {
       private User findUser(String name) {
         for (final UserContext context : context.allUsers()) {
           if (context.user.name.equals(name)) {
-            return user.user;
+            return context.user;
           }
         }
         return null;
@@ -392,7 +392,7 @@ public final class Chat {
         // TODO: fix the round trip method for an efficient lookup method
         for (final UserContext context : context.allUsers()) {
           if (context.user.name.equals(name)) {
-            return user.user;
+            return context.user;
           }
         }
         return null;
