@@ -66,8 +66,9 @@ public final class User {
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    for (Uuid user : followees.keySet())
+    for (Uuid user : followees.keySet()) {
       status.append(followees.get(user).statusUpdate());
+    }
     return status.toString();
   }
 
