@@ -66,18 +66,17 @@ public final class User {
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    System.out.println(this);
-    for (Uuid user : followees.keySet()){
+    for (Uuid user : followees.keySet()) {
       status.append(followees.get(user).statusUpdate());
     }
     return status.toString();
   }
 
   // User A wants to follow User B
-  public void follow(User userB) {
-    UserFollowing connection = new UserFollowing(this, userB);
-    followees.put(userB.id, connection);
-    userB.followers.put(this.id, connection);
+  public static void follow(User userA, User userB) {
+    UserFollowing connection = new UserFollowing(userA, userB);
+    userA.followees.put(userB.id, connection);
+    userB.followers.put(userA.id, connection);
   }
 
   // User A wants to unfollow User B
