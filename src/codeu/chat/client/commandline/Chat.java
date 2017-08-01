@@ -29,6 +29,9 @@ import codeu.chat.util.Uuid;
 
 import codeu.chat.util.Tokenizer;
 import codeu.chat.util.Time;
+import codeu.chat.util.Uuid;
+
+import codeu.chat.common.User;
 
 public final class Chat {
 
@@ -464,6 +467,18 @@ public final class Chat {
         user.followConversation(conversationID);
       }
 
+      // Find the first conversation with the given name and return its context.
+      // If no conversation has the given name, this will return null.
+      private Uuid find(String title) {
+        for (final ConversationContext context : user.conversations()) {
+          if (title.equals(context.conversation.title)) {
+            return context.conversation.id;
+          }
+        }
+        return null;
+      }
+    });
+      
       // Find the first conversation with the given name and return its context.
       // If no conversation has the given name, this will return null.
       private Uuid find(String title) {
