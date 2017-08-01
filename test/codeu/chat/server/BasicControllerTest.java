@@ -133,7 +133,7 @@ public final class BasicControllerTest {
     final User user1 = controller.newUser("user");
     
     User.follow(user, user1);
-    assertFalse("ERROR: Failed to follow user");
+    assertEquals(1, user.followees.size());
   }
   
   public void testFollowConvo() {
@@ -141,7 +141,7 @@ public final class BasicControllerTest {
     final Conversation convo1 = controller.newConversation("convo");
     
     User.follow(user, convo1);
-    assertFalse("ERROR: Failed to follow convo");
+    assertEquals(1, user.followees.size());
   }
   
   public void testPersistentStorage() {
