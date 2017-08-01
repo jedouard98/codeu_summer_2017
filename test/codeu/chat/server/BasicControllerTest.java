@@ -127,4 +127,30 @@ public final class BasicControllerTest {
     assertEquals("how are you", t2.next());
     assertFalse(t2.hasNext());
   }
+  
+  public void testFollowUser() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    
+    User.follow(user, user1);
+    assertEquals(1, user.followees.size());
+  }
+  
+  public void testFollowConvo() {
+    final User user = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    
+    User.follow(user, convo1);
+    assertEquals(1, user.followees.size());
+  }
+  
+  public void testPersistentStorage() {
+    TransactionLog tl = new TransactionLog(controller, "test", model);
+    final User u = controller.newUser("tester");
+    tl.writeCreateUser(u);
+    tl.flush();
+    File f = new File("test");
+    Scanner s = new Scanner(f);
+    
+    assertTrue(s.hasNext());
 }
