@@ -75,17 +75,6 @@ public final class User {
     return status.toString();
   }
 
-  // // User A wants to follow User B
-  // public static void follow(User userA, User userB) {
-  //   UserFollowing connection = new UserFollowing(userA, userB);
-  //   System.out.println("HERE! -------------------------" + userA.followees.size());
-  //   System.out.println(userA);
-  //   System.out.println(userB);
-  //   userA.followees.put(userB.id, connection);
-  //   userB.followers.put(userA.id, connection);
-  //   System.out.println("AFTER! -------------------------" + userA.followees.size());
-  // }
-
   // User A wants to follow User B
   public void follow(User userB) {
     UserFollowing connection = new UserFollowing(this, userB);
