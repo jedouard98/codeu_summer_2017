@@ -66,8 +66,6 @@ public final class User {
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    System.out.println("HERE! -------------------------" + followees.size());
-    System.out.println("HERE! -------------------------" + followers.size());
     System.out.println(this);
     for (Uuid user : followees.keySet()){
       status.append(followees.get(user).statusUpdate());
