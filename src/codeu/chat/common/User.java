@@ -66,21 +66,22 @@ public final class User {
 
   public String statusUpdate() {
     StringBuilder status = new StringBuilder();
-    for (Uuid user : following.keySet())
-      status.append(following.get(user).statusUpdate());
+    for (Uuid user : followees.keySet()) {
+      status.append(followees.get(user).statusUpdate());
+    }
     return status.toString();
   }
 
   // User A wants to follow User B
   public static void follow(User userA, User userB) {
     UserFollowing connection = new UserFollowing(userA, userB);
-    userA.following.put(userB.id, connection);
+    userA.followees.put(userB.id, connection);
     userB.followers.put(userA.id, connection);
   }
 
   // User A wants to unfollow User B
   public static void unfollow(User userA, User userB) {
-    userA.following.remove(userB.id);
+    userA.followees.remove(userB.id);
     userB.followers.remove(userA.id);
   }
 

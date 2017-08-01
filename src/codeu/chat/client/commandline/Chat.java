@@ -23,6 +23,10 @@ import codeu.chat.client.core.ConversationContext;
 import codeu.chat.client.core.MessageContext;
 import codeu.chat.client.core.UserContext;
 
+import codeu.chat.common.User;
+import codeu.chat.util.Uuid;
+
+
 import codeu.chat.util.Tokenizer;
 import codeu.chat.util.Time;
 
@@ -313,7 +317,7 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         System.out.println("Status Updates!");
-        System.out.print(user.statusUpdate())
+        System.out.print(user.statusUpdate());
       }
     });
 
@@ -328,16 +332,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
-        } else if (name.length() > 0) {
-          final User userToBeFollowed = findUser(name);
-          if (user == null) {
-            System.out.format("ERROR: Failed to follow '%s'\n", name);
-          } else {
-            user.followUser(userToBeFollowed);
-          }
-        } else {
-          System.out.println("ERROR: Missing <username>");
+          return;
         }
+        else if (name.length() < 0) {
+          System.out.println("ERROR: Missing <username>");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to follow '%s'\n", name);
+          return;
+        }
+
+        final User userToBeFollowed = findUser(name);
+        user.followUser(userToBeFollowed);
       }
       // TODO: add this function to user context to avoid its duplication
 
@@ -346,7 +353,7 @@ public final class Chat {
       private User findUser(String name) {
         for (final UserContext context : context.allUsers()) {
           if (context.user.name.equals(name)) {
-            return user.user;
+            return context.user;
           }
         }
         return null;
@@ -364,16 +371,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
-        } else if (name.length() > 0) {
-          final User userToBeFollowed = findUser(name);
-          if (user == null) {
-            System.out.format("ERROR: Failed to follow '%s'\n", name);
-          } else {
-            user.unfollowUser(userToBeFollowed);
-          }
-        } else {
-          System.out.println("ERROR: Missing <username>");
+          return;
         }
+        else if (name.length() < 0) {
+          System.out.println("ERROR: Missing <username>");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to follow '%s'\n", name);
+          return;
+        }
+
+        final User userToBeUnfollowed = findUser(name);
+        user.followUser(userToBeUnfollowed);
       }
 
       // Find the first user with the given name and return a user context
@@ -382,7 +392,7 @@ public final class Chat {
         // TODO: fix the round trip method for an efficient lookup method
         for (final UserContext context : context.allUsers()) {
           if (context.user.name.equals(name)) {
-            return user.user;
+            return context.user;
           }
         }
         return null;
@@ -400,17 +410,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
+          return;
         }
-        else if (name.length() > 0) {
-          final Uuid conversationID = find(name);
-          if (conversation == null) {
-            System.out.format("ERROR: No conversation with name '%s'\n", name);
-          } else {
-            user.unfollowConversation(conversationID);
-          }
-        } else {
+        else if (name.length() < 0) {
           System.out.println("ERROR: Missing <title>");
+          return;
         }
+        else if (find(name) == null) {
+          System.out.format("ERROR: No conversation with name '%s'\n", name);
+          return;
+        }
+
+        final Uuid conversationID = find(name);
+        user.unfollowConversation(conversationID);
       }
 
       // Find the first conversation with the given name and return its context.
@@ -437,17 +449,19 @@ public final class Chat {
         final String name = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
+          return;
         }
-        else if (name.length() > 0) {
-          final Uuid conversationID = find(name);
-          if (conversation == null) {
-            System.out.format("ERROR: No conversation with name '%s'\n", name);
-          } else {
-            user.followConversation(conversationID);
-          }
-        } else {
+        else if (name.length() < 0) {
           System.out.println("ERROR: Missing <title>");
+          return;
         }
+        else if (find(name) == null) {
+          System.out.format("ERROR: No conversation with name '%s'\n", name);
+          return;
+        }
+
+        final Uuid conversationID = find(name);
+        user.followConversation(conversationID);
       }
 
       // Find the first conversation with the given name and return its context.
