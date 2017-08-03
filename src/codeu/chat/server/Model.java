@@ -182,7 +182,7 @@ public final class Model {
   public StoreAccessor<Time, Message> messageByTime() {
     return messageByTime;
   }
-
+  
   public StoreAccessor<String, Message> messageByText() {
     return messageByText;
   }
