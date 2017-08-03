@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,7 @@ public final class Server {
   private static final Logger.Log LOG = Logger.newLog(Server.class);
 
   private static final Duration RELAY_REFRESH = Duration.ofSeconds(5);
-  private static final Duration TRANS_REFRESH = Duration.ofSeconds(25); // 25 seconds
+  private static final Duration TRANS_REFRESH = Duration.ofSeconds(25);  // 25 seconds
 
   private final Timeline timeline = new Timeline();
 
@@ -79,11 +79,24 @@ public final class Server {
     this.controller = new Controller(id, model);
     this.relay = relay;
 
-
     this.transactions = new TransactionLog(controller, FILE_NAME, model);
 
     this.transactions.read();
-    
+
+    // New Permission Change - A client wants to change permissions of a user
+    this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+        final User user = User.SERIALIZER.read(in);
+        final int permission = Serializers.INTEGER.read(in);
+        final Uuid conversation = Uuid.SERIALIZER.read(in);
+
+        controller.changePermission(user, permission, conversation);
+
+        Serializers.INTEGER.write(out, NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE);
+      }
+    });
+
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
       @Override
@@ -98,7 +111,7 @@ public final class Server {
       }
     });
 
-    // New Unfollow User - A client wants to unfollow a user
+    // New Unfollow User  - A client wants to unfollow a user
     this.commands.put(NetworkCode.NEW_UNFOLLOW_USER_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException{
@@ -113,7 +126,7 @@ public final class Server {
       }
     });
 
-    // New Follow User - A client wants to follow a user
+    // New Follow User  - A client wants to follow a user
     this.commands.put(NetworkCode.NEW_FOLLOW_USER_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
@@ -129,7 +142,7 @@ public final class Server {
     });
 
 
-    // New Unfollow Conversation - A client wants to unfollow a conversation.
+    // New Unfollow Conversation  - A client wants to unfollow a conversation.
     this.commands.put(NetworkCode.NEW_UNFOLLOW_CONVERSATION_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
@@ -144,7 +157,7 @@ public final class Server {
       }
     });
 
-    // New Follow Conversation - A client wants to add a follow a conversation.
+    // New Follow Conversation  - A client wants to add a follow a conversation.
     this.commands.put(NetworkCode.NEW_FOLLOW_CONVERSATION_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
@@ -158,6 +171,7 @@ public final class Server {
 
         transactions.writeFollowConvo(user, conversation);
       }
+
     });
 
     // New Message - A client wants to add a new message to the back end.
@@ -176,12 +190,15 @@ public final class Server {
 
         transactions.writeCreateMessage(message, conversation);
 
-        timeline.scheduleNow(createSendToRelayEvent(author, conversation, message.id));
+        timeline.scheduleNow(createSendToRelayEvent(
+            author,
+            conversation,
+            message.id));
       }
     });
 
     // New User - A client wants to add a new user to the back end.
-    this.commands.put(NetworkCode.NEW_USER_REQUEST, new Command() {
+    this.commands.put(NetworkCode.NEW_USER_REQUEST,  new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
@@ -196,7 +213,7 @@ public final class Server {
     });
 
     // New Conversation - A client wants to add a new conversation to the back end.
-    this.commands.put(NetworkCode.NEW_CONVERSATION_REQUEST, new Command() {
+    this.commands.put(NetworkCode.NEW_CONVERSATION_REQUEST,  new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
@@ -260,9 +277,9 @@ public final class Server {
     });
 
     // Get Conversations By Id - A client wants to get a subset of the converations from
-    // the back end. Normally this will be done after calling
-    // Get Conversations to get all the headers and now the client
-    // wants to get a subset of the payloads.
+    //                           the back end. Normally this will be done after calling
+    //                           Get Conversations to get all the headers and now the client
+    //                           wants to get a subset of the payloads.
     this.commands.put(NetworkCode.GET_CONVERSATIONS_BY_ID_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException {
@@ -376,29 +393,37 @@ public final class Server {
       // As the relay does not tell us who made the conversation - the first person who
       // has a message in the conversation will get ownership over this server's copy
       // of the conversation.
-      conversation = controller.newConversation(relayConversation.id(), relayConversation.text(),
-          user.id, relayConversation.time());
+      conversation = controller.newConversation(relayConversation.id(),
+                                                relayConversation.text(),
+                                                user.id,
+                                                relayConversation.time());
     }
 
     Message message = model.messageById().first(relayMessage.id());
 
     if (message == null) {
-      message = controller.newMessage(relayMessage.id(), user.id, conversation.id,
-          relayMessage.text(), relayMessage.time());
+      message = controller.newMessage(relayMessage.id(),
+                                      user.id,
+                                      conversation.id,
+                                      relayMessage.text(),
+                                      relayMessage.time());
     }
   }
 
-  private Runnable createSendToRelayEvent(final Uuid userId, final Uuid conversationId,
-      final Uuid messageId) {
+  private Runnable createSendToRelayEvent(final Uuid userId,
+                                          final Uuid conversationId,
+                                          final Uuid messageId) {
     return new Runnable() {
       @Override
       public void run() {
         final User user = view.findUser(userId);
         final ConversationHeader conversation = view.findConversation(conversationId);
         final Message message = view.findMessage(messageId);
-        relay.write(id, secret, relay.pack(user.id, user.name, user.creation),
-            relay.pack(conversation.id, conversation.title, conversation.creation),
-            relay.pack(message.id, message.content, message.creation));
+        relay.write(id,
+                    secret,
+                    relay.pack(user.id, user.name, user.creation),
+                    relay.pack(conversation.id, conversation.title, conversation.creation),
+                    relay.pack(message.id, message.content, message.creation));
       }
     };
   }
