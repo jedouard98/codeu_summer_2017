@@ -78,6 +78,10 @@ public final class ConversationContext {
         getMessage(updated.lastMessage);
   }
 
+  public void changePermission(User user, int permission, Uuid conversation) {
+    controller.changePermission(user, permission, conversation);
+  }
+
   private ConversationPayload getUpdated() {
     final Collection<Uuid> ids = Arrays.asList(conversation.id);
     final Iterator<ConversationPayload> payloads = view.getConversationPayloads(ids).iterator();
