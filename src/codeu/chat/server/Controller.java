@@ -40,6 +40,11 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
+  public void changePermission(User user, int permission, Uuid conversation) {
+    model.changePermission(user, permission, conversation);
+  }
+
+  @Override
   public String newStatusUpdate(Uuid user) {
     return model.statusUpdate(user);
   }
@@ -157,6 +162,8 @@ public final class Controller implements RawController, BasicController {
   public ConversationHeader newConversation(Uuid id, String title, Uuid owner, Time creationTime) {
 
     final User foundOwner = model.userById().first(owner);
+
+    changePermission(foundOwner, ConversationHeader.OWNER_PERM, id);
 
     ConversationHeader conversation = null;
 
