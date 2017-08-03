@@ -16,6 +16,7 @@ package codeu.chat.common;
 
 import codeu.chat.util.Uuid;
 import codeu.chat.common.User;
+import codeu.chat.common.ConversationHeader;
 
 // BASIC CONTROLLER
 //
@@ -25,6 +26,13 @@ import codeu.chat.common.User;
 //   should be treated as read only data as manipulating any data returned
 //   from the controller may have no effect on the server's state.
 public interface BasicController {
+  // CHANGE PERMISSIONS
+  //
+  //   Allows a user to change to permission of another user's. If the operation is
+  //   successful, the server will now have an update on the relationship between
+  //   the user and its permission
+  void changePermission(User user, int permission, Uuid conversation);
+
   // UNFOLLOW USER
   //
   //   Removes an established relationship between a user and another user.
