@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.util.HashMap;
+
 import codeu.chat.util.Serializer;
 import codeu.chat.util.Serializers;
 import codeu.chat.util.Time;
@@ -46,14 +48,18 @@ public final class ConversationHeader {
           Time.SERIALIZER.read(in),
           Serializers.STRING.read(in)
       );
-
     }
   };
+
+  public static final int OWNER_PERM = 0;
+  public static final int ADMIN_PERM = 1;
+  public static final int MEMBER_PERM = 2;
 
   public final Uuid id;
   public final Uuid owner;
   public final Time creation;
   public final String title;
+
   public int size;
 
   public ConversationHeader(Uuid id, Uuid owner, Time creation, String title) {
@@ -63,6 +69,5 @@ public final class ConversationHeader {
     this.creation = creation;
     this.title = title;
     this.size = 0;
-
   }
 }
