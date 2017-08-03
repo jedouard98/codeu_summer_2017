@@ -68,10 +68,16 @@ public final class Model {
   private final Store<Time, Message> messageByTime = new Store<>(TIME_COMPARE);
   private final Store<String, Message> messageByText = new Store<>(STRING_COMPARE);
 
+  // TODO: remove stucture all together to mimick UserFollowing Class implementation for users
   private final HashMap<Uuid, HashMap<Uuid, Integer>> userConversationTracking = new HashMap<Uuid, HashMap<Uuid, Integer>>();
 
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
+
+  public void changePermission(User user, int permission, Uuid conversation) {
+    User user1 = userById().first(user.id);
+    user1.changePermission(conversation, permission);
+  }
 
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
@@ -103,7 +109,9 @@ public final class Model {
   }
 
   public void followUser(User userA, User userB) {
-    userA.follow(userB);
+    User user1 = userById().first(userA.id);
+    User user2 = userById().first(userB.id);
+    User.follow(user1, user2);
   }
 
   public void unfollowConversation(Uuid user, Uuid conversation) {
