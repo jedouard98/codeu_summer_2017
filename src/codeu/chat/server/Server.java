@@ -364,7 +364,7 @@ public final class Server {
           LOG.error(ex, "Exception while handling connection.");
 
         }
-
+        
         try {
           connection.close();
         } catch (Exception ex) {
