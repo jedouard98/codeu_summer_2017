@@ -74,6 +74,11 @@ public final class Model {
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
 
+  public void changePermission(User user, int permission, Uuid conversation) {
+    User user1 = userById().first(user.id);
+    user1.changePermission(conversation, permission);
+  }
+
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);
