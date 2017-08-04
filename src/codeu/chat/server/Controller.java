@@ -40,8 +40,8 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
-  public void changePermission(User user, int permission, Uuid conversation) {
-    model.changePermission(user, permission, conversation);
+  public void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+    model.togglePermission(user, userToBeChanged, permission, conversation);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid author, Uuid conversation, String body) {
+  public Message newMessage(Uuid author, Uuid conversation, String body) throws Exception {
     return newMessage(createId(), author, conversation, body, Time.now());
   }
 
@@ -85,11 +85,11 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid id, Uuid author, Uuid conversation, String body, Time creationTime) {
+  public Message newMessage(Uuid id, Uuid author, Uuid conversation, String body, Time creationTime) throws Exception {
     model.conversationById().first(conversation).size++;
 
     final User foundUser = model.userById().first(author);
-    final ConversationPayload foundConversation = model.conversationPayloadById().first(conversation);
+    final ConversationPayload foundConversation = model.conversationPayloadById(author, conversation).first(conversation);
 
     Message message = null;
 
@@ -162,8 +162,6 @@ public final class Controller implements RawController, BasicController {
   public ConversationHeader newConversation(Uuid id, String title, Uuid owner, Time creationTime) {
 
     final User foundOwner = model.userById().first(owner);
-
-    changePermission(foundOwner, ConversationHeader.OWNER_PERM, id);
 
     ConversationHeader conversation = null;
 
