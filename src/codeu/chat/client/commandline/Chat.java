@@ -550,6 +550,8 @@ public final class Chat {
         System.out.println("    List all messages in the current conversation.");
         System.out.println("  m-add <message>");
         System.out.println("    Add a new message to the current conversation as the current user.");
+        System.out.println("  toggle-permission <user> <permission> ...");
+        System.out.println("    Toggle the permissions (member/admin/owner) of other users.");
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
         System.out.println("  uptime");
@@ -571,23 +573,18 @@ public final class Chat {
     panel.register("m-list", new Panel.Command() {
       @Override
       public void invoke(Tokenizer args) {
-        if (conversation.user.getPermission(conversation.conversation.id) == -1) {
-          System.out.println("ERROR: You do not have permission to view messages");
+        System.out.println("--- start of conversation ---");
+        for (MessageContext message = conversation.firstMessage();
+                            message != null;
+                            message = message.next()) {
+          System.out.println();
+          System.out.format("USER : %s\n", message.message.author);
+          System.out.format("SENT : %s\n", message.message.creation);
+          System.out.println();
+          System.out.println(message.message.content);
+          System.out.println();
         }
-        else {
-          System.out.println("--- start of conversation ---");
-          for (MessageContext message = conversation.firstMessage();
-                              message != null;
-                              message = message.next()) {
-            System.out.println();
-            System.out.format("USER : %s\n", message.message.author);
-            System.out.format("SENT : %s\n", message.message.creation);
-            System.out.println();
-            System.out.println(message.message.content);
-            System.out.println();
-          }
-          System.out.println("---  end of conversation  ---");
-        }
+        System.out.println("---  end of conversation  ---");
       }
     });
 
@@ -600,10 +597,7 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         final String message = args.hasNext() ? args.next().trim() : "";
-        if (conversation.user.getPermission(conversation.conversation.id) == -1) {
-          System.out.println("ERROR: You do not have permission to add messages");
-        }
-        else if (args.hasNext()) {
+        if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
         }
         else if (message.length() > 0) {
@@ -629,63 +623,63 @@ public final class Chat {
       }
     });
 
-    // CHANGE-PERMISSION (user's permission to be changed) (permission)
+    // TOGGLE-PERMISSION (user's permission to be changed) (permission)
     //
-    // Add a command to allow authorized users to change permissions of other users
+    // Add a command to allow authorized users to toggle permissions of other users
     //
-    panel.register("change-permission", new Panel.Command() {
-      @Override
-      public void invoke(Tokenizer args) {
-        final String name = args.hasNext() ? args.next().trim() : "";
-        final String permissionString = args.hasNext() ? args.next().trim() : "";
-
-        final int permission;
-        // convert permission string to an integer
-        if (permissionString.toLowerCase().equals("admin")) {
-          permission = ConversationHeader.ADMIN_PERM;
-        }
-        else if (permissionString.toLowerCase().equals("member")) {
-          permission = ConversationHeader.MEMBER_PERM;
-        }
-        else {
-          // The string was an invalid permission setting
-          permission = -1;
-        }
-
-        if (args.hasNext()) {
-          System.out.println("ERROR: Too many arguments for command");
-          return;
-        }
-        else if (name.length() < 0 || permission < 0) {
-          System.out.println("ERROR: Missing argument");
-          return;
-        }
-        else if (findUser(name) == null) {
-          System.out.format("ERROR: Failed to find user '%s'\n", name);
-          return;
-        }
-        else if (permission == -1) {
-          System.out.println("ERROR: Incorrect permission argument");
-          return;
-        }
-        else if (findUser(name).getPermission(conversation.conversation.id) == ConversationHeader.MEMBER_PERM) {
-          System.out.println("ERROR: You do not have permission to change users");
-          return;
-        }
-
-        final User permissionChangedUser = findUser(name);
-        conversation.changePermission(permissionChangedUser, permission, conversation.conversation.id);
-      }
-
-      private User findUser(String name) {
-        for (final UserContext context : context.allUsers()) {
-          if (context.user.name.equals(name)) {
-            return context.user;
-          }
-        }
-        return null;
-      }
-    });
+    // panel.register("toggle-permission", new Panel.Command() {
+    //   @Override
+    //   public void invoke(Tokenizer args) {
+    //     final String name = args.hasNext() ? args.next().trim() : "";
+    //     final String permissionString = args.hasNext() ? args.next().trim() : "";
+    //     //
+    //     // final int permission;
+    //     // // convert permission string to an integer
+    //     // if (permissionString.toLowerCase().equals("admin")) {
+    //     //   permission = ConversationHeader.ADMIN_PERM;
+    //     // }
+    //     // else if (permissionString.toLowerCase().equals("member")) {
+    //     //   permission = ConversationHeader.MEMBER_PERM;
+    //     // }
+    //     // else {
+    //     //   // The string was an invalid permission setting
+    //     //   permission = -1;
+    //     // }
+    //
+    //     if (args.hasNext()) {
+    //       System.out.println("ERROR: Too many arguments for command");
+    //       return;
+    //     }
+    //     else if (name.length() < 0 || permission < 0) {
+    //       System.out.println("ERROR: Missing argument");
+    //       return;
+    //     }
+    //     else if (findUser(name) == null) {
+    //       System.out.format("ERROR: Failed to find user '%s'\n", name);
+    //       return;
+    //     }
+    //     else if (permission == -1) {
+    //       System.out.println("ERROR: Incorrect permission argument");
+    //       return;
+    //     }
+    //     else if (findUser(name).getPermission(conversation.conversation.id) == ConversationHeader.MEMBER_PERM) {
+    //       System.out.println("ERROR: You do not have permission to change users");
+    //       return;
+    //     }
+    //
+    //     final User permissionChangedUser = findUser(name);
+    //     conversation.changePermission(permissionChangedUser, permission, conversation.conversation.id);
+    //   }
+    //
+    //   private User findUser(String name) {
+    //     for (final UserContext context : context.allUsers()) {
+    //       if (context.user.name.equals(name)) {
+    //         return context.user;
+    //       }
+    //     }
+    //     return null;
+    //   }
+    // });
 
     // Now that the panel has all its commands registered, return the panel
     // so that it can be used.
