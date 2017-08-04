@@ -51,9 +51,10 @@ public final class ConversationHeader {
     }
   };
 
-  public static final int OWNER_PERM = 0;
-  public static final int ADMIN_PERM = 1;
-  public static final int MEMBER_PERM = 2;
+  // bits representing different permissions each has
+  public static final byte OWNER_PERM  = 0b0100;
+  public static final byte ADMIN_PERM  = 0b0010;
+  public static final byte MEMBER_PERM = 0b0001;
 
   public final Uuid id;
   public final Uuid owner;
@@ -61,6 +62,7 @@ public final class ConversationHeader {
   public final String title;
 
   public int size;
+  public HashMap<Uuid, Byte> permissions;
 
   public ConversationHeader(Uuid id, Uuid owner, Time creation, String title) {
 
@@ -69,5 +71,51 @@ public final class ConversationHeader {
     this.creation = creation;
     this.title = title;
     this.size = 0;
+    this.permissions = new HashMap<Uuid, Byte>();
+    permissions.put(owner, OWNER_PERM);
+  }
+  
+  public boolean isOwner(Uuid user) {
+    if (!(permissions.containsKey(user))) {
+      return false;
+    }
+    Byte currentPermission = permissions.get(user);
+    return (currentPermission & OWNER_PERM > 1);
+  }
+
+  public boolean isAdmin(Uuid user) {
+    if (!(permissions.containsKey(user))) {
+      return false;
+    }
+    Byte currentPermission = permissions.get(user);
+    return (currentPermission & ADMIN_PERM > 1);
+  }
+
+  public boolean isMember(Uuid user) {
+    if (!(permissions.containsKey(user))) {
+      return false;
+    }
+    Byte currentPermission = permissions.get(user);
+    return (currentPermission & MEMBER_PERM > 1);
+  }
+
+  public byte getPermission(Uuid user){
+    if (permission.containsKey(user))
+      return permission.get(user);
+    return -1;
+  }
+
+  public void togglePermission(Uuid user, byte permission) {
+    if (permissions.containsKey(user)) {
+      byte newPermission = permissions.get(user) ^ permission;
+      if (newPermission == 0) {
+        permissions.remove(user);
+      }
+      else {
+        permissions.put(user, newPermission);
+      }
+      return;
+    }
+    permissions.put(user, permission);
   }
 }
