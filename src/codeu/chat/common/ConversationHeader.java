@@ -74,13 +74,13 @@ public final class ConversationHeader {
     this.permissions = new HashMap<Uuid, Byte>();
     permissions.put(owner, OWNER_PERM);
   }
-  
+
   public boolean isOwner(Uuid user) {
     if (!(permissions.containsKey(user))) {
       return false;
     }
     Byte currentPermission = permissions.get(user);
-    return (currentPermission & OWNER_PERM > 1);
+    return ((currentPermission & OWNER_PERM) > 1);
   }
 
   public boolean isAdmin(Uuid user) {
@@ -88,7 +88,7 @@ public final class ConversationHeader {
       return false;
     }
     Byte currentPermission = permissions.get(user);
-    return (currentPermission & ADMIN_PERM > 1);
+    return ((currentPermission & ADMIN_PERM) > 1);
   }
 
   public boolean isMember(Uuid user) {
@@ -96,18 +96,18 @@ public final class ConversationHeader {
       return false;
     }
     Byte currentPermission = permissions.get(user);
-    return (currentPermission & MEMBER_PERM > 1);
+    return ((currentPermission & MEMBER_PERM) > 1);
   }
 
   public byte getPermission(Uuid user){
-    if (permission.containsKey(user))
-      return permission.get(user);
+    if (permissions.containsKey(user))
+      return permissions.get(user);
     return -1;
   }
 
   public void togglePermission(Uuid user, byte permission) {
     if (permissions.containsKey(user)) {
-      byte newPermission = permissions.get(user) ^ permission;
+      byte newPermission = (byte) (permissions.get(user) ^ permission);
       if (newPermission == 0) {
         permissions.remove(user);
       }
