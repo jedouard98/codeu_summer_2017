@@ -74,11 +74,6 @@ public final class Model {
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
 
-  public void changePermission(User user, int permission, Uuid conversation) {
-    User user1 = userById().first(user.id);
-    user1.changePermission(conversation, permission);
-  }
-
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);
@@ -165,7 +160,11 @@ public final class Model {
     return conversationByText;
   }
 
-  public StoreAccessor<Uuid, ConversationPayload> conversationPayloadById() {
+  public StoreAccessor<Uuid, ConversationPayload> conversationPayloadById(Uuid user, Uuid conversation) {
+    ConversationHeader conversationServer = conversationsById.first(conversation);
+    if (conversationServer.getPermission(user) == -1) {
+      return null;
+    }
     return conversationPayloadById;
   }
 
@@ -182,7 +181,7 @@ public final class Model {
   public StoreAccessor<Time, Message> messageByTime() {
     return messageByTime;
   }
-  
+
   public StoreAccessor<String, Message> messageByText() {
     return messageByText;
   }
