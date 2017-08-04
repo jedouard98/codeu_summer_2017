@@ -56,27 +56,12 @@ public final class User {
   public HashMap<Uuid, UserFollowing> followees;
   public HashMap<Uuid, UserFollowing> followers;
 
-  public HashMap<Uuid, Integer> permissions;
-
   public User(Uuid id, String name, Time creation) {
     this.id = id;
     this.name = name;
     this.creation = creation;
     this.followees = new HashMap<Uuid, UserFollowing>();
     this.followers = new HashMap<Uuid, UserFollowing>();
-    this.permissions = new HashMap<Uuid, Integer>();
-  }
-
-  public int getPermission(Uuid conversation) {
-    System.out.println("This is my permission: " + permissions.get(conversation));
-    if (permissions.containsKey(conversation)) {
-      return permissions.get(conversation);
-    }
-    return -1;
-  }
-
-  public void changePermission(Uuid conversation, int permission) {
-    permissions.put(conversation, permission);
   }
 
   public String statusUpdate() {
