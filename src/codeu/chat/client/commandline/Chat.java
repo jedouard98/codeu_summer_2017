@@ -574,18 +574,24 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         System.out.println("--- start of conversation ---");
-        for (MessageContext message = conversation.firstMessage();
-                            message != null;
-                            message = message.next()) {
-          System.out.println();
-          System.out.format("USER : %s\n", message.message.author);
-          System.out.format("SENT : %s\n", message.message.creation);
-          System.out.println();
-          System.out.println(message.message.content);
-          System.out.println();
+
+        try {
+          for (MessageContext message = conversation.firstMessage();
+                              message != null;
+                              message = message.next()) {
+            System.out.println();
+            System.out.format("USER : %s\n", message.message.author);
+            System.out.format("SENT : %s\n", message.message.creation);
+            System.out.println();
+            System.out.println(message.message.content);
+            System.out.println();
+          }
         }
-        System.out.println("---  end of conversation  ---");
-      }
+        catch (Exception e) {
+          System.out.println("You do not have permission to view this content");
+        }
+          System.out.println("---  end of conversation  ---");
+        }
     });
 
     // M-ADD (add message)
@@ -601,7 +607,12 @@ public final class Chat {
           System.out.println("ERROR: Too many arguments for command");
         }
         else if (message.length() > 0) {
-          conversation.add(message);
+          try {
+            conversation.add(message);
+          }
+          catch (Exception ex) {
+            System.out.println("You do not have permission to add new messages");
+          }
         } else {
           System.out.println("ERROR: Messages must contain text");
         }
@@ -627,59 +638,51 @@ public final class Chat {
     //
     // Add a command to allow authorized users to toggle permissions of other users
     //
-    // panel.register("toggle-permission", new Panel.Command() {
-    //   @Override
-    //   public void invoke(Tokenizer args) {
-    //     final String name = args.hasNext() ? args.next().trim() : "";
-    //     final String permissionString = args.hasNext() ? args.next().trim() : "";
-    //     //
-    //     // final int permission;
-    //     // // convert permission string to an integer
-    //     // if (permissionString.toLowerCase().equals("admin")) {
-    //     //   permission = ConversationHeader.ADMIN_PERM;
-    //     // }
-    //     // else if (permissionString.toLowerCase().equals("member")) {
-    //     //   permission = ConversationHeader.MEMBER_PERM;
-    //     // }
-    //     // else {
-    //     //   // The string was an invalid permission setting
-    //     //   permission = -1;
-    //     // }
-    //
-    //     if (args.hasNext()) {
-    //       System.out.println("ERROR: Too many arguments for command");
-    //       return;
-    //     }
-    //     else if (name.length() < 0 || permission < 0) {
-    //       System.out.println("ERROR: Missing argument");
-    //       return;
-    //     }
-    //     else if (findUser(name) == null) {
-    //       System.out.format("ERROR: Failed to find user '%s'\n", name);
-    //       return;
-    //     }
-    //     else if (permission == -1) {
-    //       System.out.println("ERROR: Incorrect permission argument");
-    //       return;
-    //     }
-    //     else if (findUser(name).getPermission(conversation.conversation.id) == ConversationHeader.MEMBER_PERM) {
-    //       System.out.println("ERROR: You do not have permission to change users");
-    //       return;
-    //     }
-    //
-    //     final User permissionChangedUser = findUser(name);
-    //     conversation.changePermission(permissionChangedUser, permission, conversation.conversation.id);
-    //   }
-    //
-    //   private User findUser(String name) {
-    //     for (final UserContext context : context.allUsers()) {
-    //       if (context.user.name.equals(name)) {
-    //         return context.user;
-    //       }
-    //     }
-    //     return null;
-    //   }
-    // });
+    panel.register("toggle-permission", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+
+        int permission = 0;
+
+        while (args.hasNext()) {
+          final String permissionString = args.hasNext() ? args.next().trim().toLowerCase() : "";
+          switch (permissionString) {
+            case "admin":  permission = permission ^ ConversationHeader.ADMIN_PERM;
+                           break;
+            case "owner":  permission = permission ^ ConversationHeader.OWNER_PERM;
+                           break;
+            case "member": permission = permission ^ ConversationHeader.MEMBER_PERM;
+                           break;
+            default:       System.out.println("ERROR: input is not a valid condition"); return;
+          }
+        }
+        if (conversation.conversation.isMember(conversation.user.id)) {
+          System.out.println("You do not have permission to change permissions.");
+          return;
+        }
+        if (name.length() < 0) {
+          System.out.println("ERROR: Missing argument");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to find user '%s'\n", name);
+          return;
+        }
+
+        final User permissionChangedUser = findUser(name);
+        conversation.togglePermission(permissionChangedUser.id, permission, conversation.conversation.id);
+      }
+
+      private User findUser(String name) {
+        for (final UserContext context : context.allUsers()) {
+          if (context.user.name.equals(name)) {
+            return context.user;
+          }
+        }
+        return null;
+      }
+    });
 
     // Now that the panel has all its commands registered, return the panel
     // so that it can be used.
