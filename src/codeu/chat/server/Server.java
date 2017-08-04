@@ -46,7 +46,7 @@ import codeu.chat.util.connections.Connection;
 public final class Server {
 
   private interface Command {
-    void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException;
+    void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException, Exception;
   }
 
   public static TransactionLog transactions;
@@ -72,7 +72,7 @@ public final class Server {
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
-  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException, InterruptedException {
+  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException, InterruptedException, Exception {
 
     this.id = id;
     this.secret = secret;
@@ -87,11 +87,12 @@ public final class Server {
     this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
       @Override
       public void onMessage(InputStream in, OutputStream out) throws IOException {
-        final User user = User.SERIALIZER.read(in);
+        final Uuid user = Uuid.SERIALIZER.read(in);
+        final Uuid userToBeChanged = Uuid.SERIALIZER.read(in);
         final int permission = Serializers.INTEGER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
 
-        controller.changePermission(user, permission, conversation);
+        controller.togglePermission(user, userToBeChanged, permission, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE);
       }
@@ -141,7 +142,6 @@ public final class Server {
       }
     });
 
-
     // New Unfollow Conversation  - A client wants to unfollow a conversation.
     this.commands.put(NetworkCode.NEW_UNFOLLOW_CONVERSATION_REQUEST, new Command() {
       @Override
@@ -177,7 +177,7 @@ public final class Server {
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException, Exception {
 
         final Uuid author = Uuid.SERIALIZER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
@@ -282,7 +282,7 @@ public final class Server {
     //                           wants to get a subset of the payloads.
     this.commands.put(NetworkCode.GET_CONVERSATIONS_BY_ID_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, Exception {
 
         final Collection<Uuid> ids = Serializers.collection(Uuid.SERIALIZER).read(in);
         final Uuid user = Uuid.SERIALIZER.read(in);
@@ -358,7 +358,12 @@ public final class Server {
             Serializers.INTEGER.write(connection.out(), NetworkCode.NO_MESSAGE);
             LOG.info("Connection rejected");
           } else {
-            command.onMessage(connection.in(), connection.out());
+            try {
+              command.onMessage(connection.in(), connection.out());
+            }
+            catch (Exception ex){
+              LOG.info("Access denied.");
+            }
             LOG.info("Connection accepted");
           }
 
@@ -377,7 +382,7 @@ public final class Server {
     });
   }
 
-  private void onBundle(Relay.Bundle bundle) {
+  private void onBundle(Relay.Bundle bundle) throws Exception {
 
     final Relay.Bundle.Component relayUser = bundle.user();
     final Relay.Bundle.Component relayConversation = bundle.conversation();
