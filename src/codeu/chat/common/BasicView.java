@@ -55,7 +55,7 @@ public interface BasicView {
   // GET CONVERSATIONS
   //
   //   Return all conversations whose id is found in the given collection.
-  Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids);
+  Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids, Uuid user, Uuid conversation) throws Exception;
 
   // GET MESSAGES
   //
