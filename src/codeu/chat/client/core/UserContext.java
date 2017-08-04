@@ -72,6 +72,7 @@ public final class UserContext {
     for (final ConversationHeader conversation : view.getConversations()) {
       all.add(new ConversationContext(user, conversation, view, controller));
     }
+
     return all;
   }
 }
