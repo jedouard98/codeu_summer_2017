@@ -285,7 +285,10 @@ public final class Server {
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
         final Collection<Uuid> ids = Serializers.collection(Uuid.SERIALIZER).read(in);
-        final Collection<ConversationPayload> conversations = view.getConversationPayloads(ids);
+        final Uuid user = Uuid.SERIALIZER.read(in);
+        final Uuid conversation = Uuid.SERIALIZER.read(in);
+
+        final Collection<ConversationPayload> conversations = view.getConversationPayloads(ids, user, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.GET_CONVERSATIONS_BY_ID_RESPONSE);
         Serializers.collection(ConversationPayload.SERIALIZER).write(out, conversations);
@@ -364,7 +367,7 @@ public final class Server {
           LOG.error(ex, "Exception while handling connection.");
 
         }
-        
+
         try {
           connection.close();
         } catch (Exception ex) {
