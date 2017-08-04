@@ -153,4 +153,19 @@ public final class BasicControllerTest {
     Scanner s = new Scanner(f);
     
     assertTrue(s.hasNext());
+  }
+  
+  public void testPermissions() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    
+    convo1.togglePermission(user.Uuid, 001);
+    
+    assertTrue(convo1.isMember(user.Uuid));
+    assertFalse(convo1.isAdmin(user.Uuid));
+    assertFalse(convo1.isOwner(user.Uuid));
+    
+    assertFalse(convo1.isMember(user1.Uuid));
+  }
 }
