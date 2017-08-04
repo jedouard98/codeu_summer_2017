@@ -83,20 +83,6 @@ public final class Server {
 
     this.transactions.read();
 
-    // New Permission Change - A client wants to change permissions of a user
-    this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
-      @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException {
-        final User user = User.SERIALIZER.read(in);
-        final int permission = Serializers.INTEGER.read(in);
-        final Uuid conversation = Uuid.SERIALIZER.read(in);
-
-        controller.changePermission(user, permission, conversation);
-
-        Serializers.INTEGER.write(out, NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE);
-      }
-    });
-
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
       @Override
