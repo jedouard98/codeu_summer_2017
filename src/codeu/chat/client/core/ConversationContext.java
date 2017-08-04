@@ -78,18 +78,17 @@ public final class ConversationContext {
         getMessage(updated.lastMessage);
   }
 
-  public void changePermission(User user, int permission, Uuid conversation) {
-    controller.changePermission(user, permission, conversation);
-  }
-
   private ConversationPayload getUpdated() {
     final Collection<Uuid> ids = Arrays.asList(conversation.id);
+    if (view.getConversationPayloads(ids) == null) {
+      return null;
+    }
     final Iterator<ConversationPayload> payloads = view.getConversationPayloads(ids).iterator();
     return payloads.hasNext() ? payloads.next() : null;
   }
 
   private MessageContext getMessage(Uuid id) {
-    final Iterator<Message> messages = view.getMessages(Arrays.asList(id)).iterator();
+    final Iterator<Message> messages = view.getMessages(Arrays.asList(id), user.id, conversation.id).iterator();
     return messages.hasNext() ? new MessageContext(messages.next(), view) : null;
   }
 }
