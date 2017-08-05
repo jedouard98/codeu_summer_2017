@@ -69,8 +69,21 @@ public final class View implements BasicView, SinglesView {
   }
 
   @Override
-  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids, Uuid user, Uuid conversation) throws Exception{
-    return intersect(model.conversationPayloadById(user, conversation), ids);
+  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids, Uuid user, Uuid conversation) {
+    Collection<ConversationPayload> conversations = intersect(model.conversationPayloadById(), ids);
+
+    Collection<ConversationPayload> conversationClone = new HashSet<ConversationPayload>();
+
+    for (ConversationPayload convo : conversations) {
+      ConversationPayload convoClone = new ConversationPayload(convo);
+      Uuid conversationID = convoClone.id;
+      ConversationHeader foundConversation = model.conversationById().first(convoClone.id);
+      if (foundConversation.getPermission(user) < 1) {
+        convoClone.setErrorMessage("You do not have permission to view this content.");
+      }
+      conversationClone.add(convoClone);
+    }
+    return conversationClone;
   }
 
   @Override
