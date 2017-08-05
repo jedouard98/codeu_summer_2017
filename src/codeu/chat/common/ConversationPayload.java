@@ -52,6 +52,8 @@ public final class ConversationPayload {
   // These are allowed to be updated and therefore are not marked final
   public Uuid firstMessage = Uuid.NULL;
   public Uuid lastMessage = Uuid.NULL;
+  public ArrayList<CleverBotUser> bots;
+
   private String errorMessage = "";
 
   public ConversationPayload(Uuid id) {
@@ -62,6 +64,7 @@ public final class ConversationPayload {
     this.id = id;
     this.firstMessage = firstMessage;
     this.lastMessage = lastMessage;
+    this.bots = new ArrayList<CleverBotUser>();
   }
 
   public ConversationPayload(Uuid id, Uuid firstMessage, Uuid lastMessage, String errorMessage) {
