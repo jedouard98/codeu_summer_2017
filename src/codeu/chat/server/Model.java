@@ -22,6 +22,7 @@ import codeu.chat.common.ConversationPayload;
 import codeu.chat.common.LinearUuidGenerator;
 import codeu.chat.common.Message;
 import codeu.chat.common.User;
+import codeu.chat.common.CleverBotUser;
 import codeu.chat.util.Time;
 import codeu.chat.util.Uuid;
 import codeu.chat.util.store.Store;
@@ -90,6 +91,13 @@ public final class Model {
     }
     foundConversation.togglePermission(targetUser, (byte) permission);
     return foundConversation.getPermission(targetUser);
+  }
+  
+  public CleverBotUser addBot(CleverBotUser user, Uuid conversation) {
+    ConversationPayload foundConversation = conversationPayloadById().first(conversation);
+    System.out.println("This the conversation: " + foundConversation);
+    foundConversation.bots.add(user);
+    return user;
   }
 
   public void add(User user) {
