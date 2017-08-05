@@ -40,7 +40,9 @@ final class Controller implements BasicController {
   }
 
   @Override
-  public void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+  public int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+    int permissionResponse = -1;
+    
     try (final Connection connection = source.connect()) {
       Serializers.INTEGER.write(connection.out(), NetworkCode.NEW_PERMISSION_CHANGE_REQUEST);
       Uuid.SERIALIZER.write(connection.out(), user);
@@ -48,14 +50,17 @@ final class Controller implements BasicController {
       Serializers.INTEGER.write(connection.out(), permission);
       Uuid.SERIALIZER.write(connection.out(), conversation);
 
-      if (!(Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE)) {
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE) {
+        permissionResponse = Serializers.INTEGER.read(connection.in());
+      } else {
         LOG.error("Response from server failed.");
       }
     } catch (Exception ex) {
       System.out.println("ERROR: Exception during call on server. Check log for details.");
       LOG.error(ex, "Exception during call on server.");
     }
-  }
+    return permissionResponse;
+}
 
   @Override
   public String newStatusUpdate(Uuid user) {
@@ -102,8 +107,6 @@ final class Controller implements BasicController {
       Serializers.INTEGER.write(connection.out(), NetworkCode.NEW_FOLLOW_USER_REQUEST);
       User.SERIALIZER.write(connection.out(), userFollowing);
       User.SERIALIZER.write(connection.out(), userToBeFollowed);
-      System.out.println("core: " + userFollowing);
-      System.out.println("core: " + userToBeFollowed);
 
       if (!(Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_FOLLOW_CONVERSATION_RESPONSE)) {
         LOG.error("Response from server failed.");
@@ -147,7 +150,7 @@ final class Controller implements BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid author, Uuid conversation, String body) throws Exception {
+  public Message newMessage(Uuid author, Uuid conversation, String body) {
 
     Message response = null;
 
