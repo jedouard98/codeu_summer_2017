@@ -60,6 +60,7 @@ public final class ConversationPayload {
 
   public ConversationPayload(Uuid id) {
     this.id = id;
+    this.bots = new ArrayList<CleverBotUser>();
   }
 
   public ConversationPayload(Uuid id, Uuid firstMessage, Uuid lastMessage) {
