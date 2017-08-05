@@ -47,12 +47,10 @@ public final class UserContext {
     controller.unfollowUser(user, userB);
   }
 
-  // TODO: fix conversation method to take in Conversation
   public void unfollowConversation(Uuid conversation) {
     controller.unfollowConversation(user.id, conversation);
   }
 
-    // TODO: fix conversation method to take in Conversation
   public void followConversation(Uuid conversation) {
     controller.followConversation(user.id, conversation);
   }
