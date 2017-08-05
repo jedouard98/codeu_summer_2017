@@ -256,8 +256,6 @@ public final class Chat {
         System.out.println("    Unfollow a conversation to stop updates from conversation.");
         System.out.println("  status-update");
         System.out.println("    Retrieve updates on users and conversations current user is following.");
-        System.out.println("  add-bot <name>");
-        System.out.println("    Add a bot to the conversation for some fun!");
         System.out.println("  info");
         System.out.println("    Display all info for the current user.");
         System.out.println("  uptime");
@@ -268,27 +266,6 @@ public final class Chat {
         System.out.println("    Go back to ROOT MODE.");
         System.out.println("  exit");
         System.out.println("    Exit the program.");
-      }
-    });
-    
-    // ADD-BOT (adds bots)
-    //
-    // Add a command that will allow an interactive bot into the conversation!
-    //
-    panel.register("add-bot", new Panel.Command() {
-      @Override
-      public void invoke(Tokenizer args) {
-        final String name = args.hasNext() ? args.next().trim() : "";
-        if (args.hasNext()) {
-          System.out.println("ERROR: Too many arguments for command");
-        }
-        else if (name.length() > 0) {
-          if (conversation.createBot(name) == null) {
-            System.out.println("ERROR: Failed to create new bot");
-          }
-        } else {
-          System.out.println("ERROR: Missing <username>");
-        }
       }
     });
 
@@ -573,6 +550,8 @@ public final class Chat {
         System.out.println("    Add a new message to the current conversation as the current user.");
         System.out.println("  toggle-permission <user> <permission> ...");
         System.out.println("    Toggle the permissions (member/admin/owner) of other users.");
+        System.out.println("  add-bot <name>");
+        System.out.println("    Add a bot to the conversation for some fun!");
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
         System.out.println("  uptime");
@@ -583,6 +562,27 @@ public final class Chat {
         System.out.println("    Go back to USER MODE.");
         System.out.println("  exit");
         System.out.println("    Exit the program.");
+      }
+    });
+    
+    // ADD-BOT (adds bots)
+    //
+    // Add a command that will allow an interactive bot into the conversation!
+    //
+    panel.register("add-bot", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+        if (args.hasNext()) {
+          System.out.println("ERROR: Too many arguments for command");
+        }
+        else if (name.length() > 0) {
+          if (conversation.createBot(name) == null) {
+            System.out.println("ERROR: Failed to create new bot");
+          }
+        } else {
+          System.out.println("ERROR: Missing <username>");
+        }
       }
     });
 
