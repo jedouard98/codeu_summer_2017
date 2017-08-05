@@ -75,28 +75,33 @@ public final class ConversationHeader {
     permissions.put(owner, OWNER_PERM);
   }
 
-  public boolean isOwner(Uuid user) {
-    if (!(permissions.containsKey(user))) {
-      return false;
+  public String formatPermission(int permission) {
+    String ownerStatus = "";
+    String adminStatus = "";
+    String memberStatus = "";
+
+    if (isOwner(permission)) {
+      ownerStatus = "Owner";
     }
-    Byte currentPermission = permissions.get(user);
-    return ((currentPermission & OWNER_PERM) > 1);
+    if (isAdmin(permission)) {
+      adminStatus = "Admin";
+    }
+    if (isMember(permission)) {
+      memberStatus = "Member";
+    }
+    return String.format("%s %s %s", ownerStatus, adminStatus, memberStatus);
   }
 
-  public boolean isAdmin(Uuid user) {
-    if (!(permissions.containsKey(user))) {
-      return false;
-    }
-    Byte currentPermission = permissions.get(user);
-    return ((currentPermission & ADMIN_PERM) > 1);
+  public static boolean isOwner(int permission) {
+    return ((permission & OWNER_PERM) > 0);
   }
 
-  public boolean isMember(Uuid user) {
-    if (!(permissions.containsKey(user))) {
-      return false;
-    }
-    Byte currentPermission = permissions.get(user);
-    return ((currentPermission & MEMBER_PERM) > 1);
+  public static boolean isAdmin(int permission) {
+    return ((permission & ADMIN_PERM) > 0);
+  }
+
+  public static boolean isMember(int permission) {
+    return ((permission & MEMBER_PERM) > 0);
   }
 
   public byte getPermission(Uuid user){
