@@ -146,11 +146,7 @@ final class View implements BasicView {
       Uuid.SERIALIZER.write(connection.out(), conversation);
 
       if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_CONVERSATIONS_BY_ID_RESPONSE) {
-        Collection<ConversationPayload> conversationsCheck = Serializers.collection(ConversationPayload.SERIALIZER).read(connection.in())
-        if (conversationsCheck == null) {
-          return null;
-        }
-        conversations.addAll(conversationsCheck);
+        conversations.addAll(Serializers.collection(ConversationPayload.SERIALIZER).read(connection.in()));
       } else {
         LOG.error("Response from server failed.");
       }
