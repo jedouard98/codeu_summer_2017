@@ -155,28 +155,29 @@ public final class BasicControllerTest {
     assertTrue(s.hasNext());
   }
   
-  public void testPermissions() {
+  public void testPermissionsToggle() {
     final User user = controller.newUser("user");
     final User user1 = controller.newUser("user");
     final Conversation convo1 = controller.newConversation("convo");
     final Conversation convo2 = controller.newConversation("convo");
-    Time t = new Time();
-    final ConversationHeaer convo3 = new ConversationHeader(user.id, user.id, t, "convo")
-     
-    
+         
     convo1.togglePermission(user.id, 001);
     
     assertTrue(convo1.isMember(user.id));
     assertFalse(convo1.isAdmin(user.id));
     assertFalse(convo1.isOwner(user.id));
+  }
+  
+  public void testPermissionReject() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    final Conversation convo2 = controller.newConversation("convo");
     
     assertFalse(convo1.isMember(user1.id));
+    assertFalse(convo1.isAdmin(user1.id));
+    assertFalse(convo1.isOwner(user1.id));
     
-    asserFalse(convo3.isMember(user1.id));
-    
-    final Message message = controller.newMessage(user1.id, conversation.id, "Hello World");
-    
-    assertTrue("You do not have permission to add messages");
-
+     assertTrue(convo1.conversationPayload.getErrorMessage != "You do not have permission to add messages");
   }
 }
