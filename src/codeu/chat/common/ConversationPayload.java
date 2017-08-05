@@ -22,6 +22,8 @@ import codeu.chat.util.Serializer;
 import codeu.chat.util.Serializers;
 import codeu.chat.util.Uuid;
 
+import java.util.ArrayList;
+
 public final class ConversationPayload {
 
   public static final Serializer<ConversationPayload> SERIALIZER = new Serializer<ConversationPayload>() {
