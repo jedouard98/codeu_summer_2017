@@ -23,6 +23,7 @@ import codeu.chat.common.Message;
 import codeu.chat.common.RandomUuidGenerator;
 import codeu.chat.common.RawController;
 import codeu.chat.common.User;
+import codeu.chat.common.CleverBotUser;
 import codeu.chat.util.Logger;
 import codeu.chat.util.Time;
 import codeu.chat.util.Uuid;
@@ -38,7 +39,12 @@ public final class Controller implements RawController, BasicController {
     this.model = model;
     this.uuidGenerator = new RandomUuidGenerator(serverId, System.currentTimeMillis());
   }
-
+  
+  @Override
+  public CleverBotUser newBot(String name, Uuid conversation) {
+    return newBot(createId(), name, Time.now(), conversation);
+  }
+  
   @Override
   public int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
     ConversationHeader foundConversation = model.conversationById().first(conversation);
@@ -77,6 +83,16 @@ public final class Controller implements RawController, BasicController {
   @Override
   public Message newMessage(Uuid author, Uuid conversation, String body) {
     return newMessage(createId(), author, conversation, body, Time.now());
+  }
+  
+  public void botResponse(String message, Uuid conversation) {
+    ConversationPayload foundConversation = model.conversationPayloadById().first(conversation);
+    String lastMessage = message;
+
+    for (CleverBotUser bot : foundConversation.bots) {
+      lastMessage = bot.response(lastMessage);
+      newMessage(bot.id, conversation, lastMessage);
+    }
   }
 
   @Override
@@ -155,6 +171,34 @@ public final class Controller implements RawController, BasicController {
 
       LOG.info(
           "newUser fail - id in use (user.id=%s user.name=%s user.time=%s)",
+          id,
+          name,
+          creationTime);
+    }
+
+    return user;
+  }
+  
+  @Override
+  public CleverBotUser newBot(Uuid id, String name, Time creationTime, Uuid conversation) {
+
+    CleverBotUser user = null;
+
+    if (isIdFree(id)) {
+
+      user = new CleverBotUser(id, name, creationTime);
+      model.addBot(user, conversation);
+
+      LOG.info(
+          "newBot success (user.id=%s user.name=%s user.time=%s)",
+          id,
+          name,
+          creationTime);
+
+    } else {
+
+      LOG.info(
+          "newBot fail - id in use (user.id=%s user.name=%s user.time=%s)",
           id,
           name,
           creationTime);
