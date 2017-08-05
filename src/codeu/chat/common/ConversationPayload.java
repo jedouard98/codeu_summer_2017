@@ -32,6 +32,7 @@ public final class ConversationPayload {
       Uuid.SERIALIZER.write(out, value.id);
       Uuid.SERIALIZER.write(out, value.firstMessage);
       Uuid.SERIALIZER.write(out, value.lastMessage);
+      Serializers.STRING.write(out, value.errorMessage);
 
     }
 
@@ -41,8 +42,8 @@ public final class ConversationPayload {
       return new ConversationPayload(
           Uuid.SERIALIZER.read(in),
           Uuid.SERIALIZER.read(in),
-          Uuid.SERIALIZER.read(in));
-
+          Uuid.SERIALIZER.read(in),
+          Serializers.STRING.read(in));
     }
   };
 
@@ -51,6 +52,7 @@ public final class ConversationPayload {
   // These are allowed to be updated and therefore are not marked final
   public Uuid firstMessage = Uuid.NULL;
   public Uuid lastMessage = Uuid.NULL;
+  private String errorMessage = "";
 
   public ConversationPayload(Uuid id) {
     this.id = id;
@@ -60,5 +62,27 @@ public final class ConversationPayload {
     this.id = id;
     this.firstMessage = firstMessage;
     this.lastMessage = lastMessage;
+  }
+
+  public ConversationPayload(Uuid id, Uuid firstMessage, Uuid lastMessage, String errorMessage) {
+    this.id = id;
+    this.firstMessage = firstMessage;
+    this.lastMessage = lastMessage;
+    this.errorMessage = errorMessage;
+  }
+
+  public ConversationPayload(ConversationPayload that) {
+    this.id = that.id;
+    this.firstMessage = that.firstMessage;
+    this.lastMessage = that.lastMessage;
+    this.errorMessage = that.getErrorMessage();
+  }
+
+  public void setErrorMessage(String error) {
+    this.errorMessage = error;
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }
 }
