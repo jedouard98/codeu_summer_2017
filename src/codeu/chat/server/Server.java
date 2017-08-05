@@ -46,7 +46,7 @@ import codeu.chat.util.connections.Connection;
 public final class Server {
 
   private interface Command {
-    void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException;
+    void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException, Exception;
   }
 
   public static TransactionLog transactions;
@@ -79,9 +79,25 @@ public final class Server {
     this.controller = new Controller(id, model);
     this.relay = relay;
 
-    this.transactions = new TransactionLog(controller, FILE_NAME, model);
+    Server.transactions = new TransactionLog(controller, FILE_NAME, model);
 
-    this.transactions.read();
+    Server.transactions.read();
+
+    // New Permission Change - A client wants to change permissions of a user
+    this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
+        final Uuid user = Uuid.SERIALIZER.read(in);
+        final Uuid userToBeChanged = Uuid.SERIALIZER.read(in);
+        final int permission = Serializers.INTEGER.read(in);
+        final Uuid conversation = Uuid.SERIALIZER.read(in);
+
+        final int permissionResponse = controller.togglePermission(user, userToBeChanged, permission, conversation);
+
+        Serializers.INTEGER.write(out, NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE);
+        Serializers.INTEGER.write(out, permissionResponse);
+      }
+    });
 
     // New Status Update - A client wants to know what updates there are
     this.commands.put(NetworkCode.NEW_STATUS_UPDATE_REQUEST, new Command() {
@@ -126,7 +142,6 @@ public final class Server {
         transactions.writeFollowUser(userA, userB);
       }
     });
-
 
     // New Unfollow Conversation  - A client wants to unfollow a conversation.
     this.commands.put(NetworkCode.NEW_UNFOLLOW_CONVERSATION_REQUEST, new Command() {
@@ -271,7 +286,10 @@ public final class Server {
       public void onMessage(InputStream in, OutputStream out) throws IOException {
 
         final Collection<Uuid> ids = Serializers.collection(Uuid.SERIALIZER).read(in);
-        final Collection<ConversationPayload> conversations = view.getConversationPayloads(ids);
+        final Uuid user = Uuid.SERIALIZER.read(in);
+        final Uuid conversation = Uuid.SERIALIZER.read(in);
+
+        final Collection<ConversationPayload> conversations = view.getConversationPayloads(ids, user, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.GET_CONVERSATIONS_BY_ID_RESPONSE);
         Serializers.collection(ConversationPayload.SERIALIZER).write(out, conversations);
@@ -341,7 +359,12 @@ public final class Server {
             Serializers.INTEGER.write(connection.out(), NetworkCode.NO_MESSAGE);
             LOG.info("Connection rejected");
           } else {
-            command.onMessage(connection.in(), connection.out());
+            try {
+              command.onMessage(connection.in(), connection.out());
+            }
+            catch (Exception ex){
+              LOG.info("Access denied.");
+            }
             LOG.info("Connection accepted");
           }
 
@@ -360,7 +383,7 @@ public final class Server {
     });
   }
 
-  private void onBundle(Relay.Bundle bundle) {
+  private void onBundle(Relay.Bundle bundle) throws Exception {
 
     final Relay.Bundle.Component relayUser = bundle.user();
     final Relay.Bundle.Component relayConversation = bundle.conversation();

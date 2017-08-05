@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.util.HashMap;
+
 import codeu.chat.util.Serializer;
 import codeu.chat.util.Serializers;
 import codeu.chat.util.Time;
@@ -46,15 +48,21 @@ public final class ConversationHeader {
           Time.SERIALIZER.read(in),
           Serializers.STRING.read(in)
       );
-
     }
   };
+
+  // bits representing different permissions each has
+  public static final byte OWNER_PERM  = 0b0100;
+  public static final byte ADMIN_PERM  = 0b0010;
+  public static final byte MEMBER_PERM = 0b0001;
 
   public final Uuid id;
   public final Uuid owner;
   public final Time creation;
   public final String title;
+
   public int size;
+  public HashMap<Uuid, Byte> permissions;
 
   public ConversationHeader(Uuid id, Uuid owner, Time creation, String title) {
 
@@ -63,6 +71,56 @@ public final class ConversationHeader {
     this.creation = creation;
     this.title = title;
     this.size = 0;
+    this.permissions = new HashMap<Uuid, Byte>();
+    permissions.put(owner, OWNER_PERM);
+  }
 
+  public String formatPermission(int permission) {
+    String ownerStatus = "";
+    String adminStatus = "";
+    String memberStatus = "";
+
+    if (isOwner(permission)) {
+      ownerStatus = "Owner";
+    }
+    if (isAdmin(permission)) {
+      adminStatus = "Admin";
+    }
+    if (isMember(permission)) {
+      memberStatus = "Member";
+    }
+    return String.format("%s %s %s", ownerStatus, adminStatus, memberStatus);
+  }
+
+  public static boolean isOwner(int permission) {
+    return ((permission & OWNER_PERM) > 0);
+  }
+
+  public static boolean isAdmin(int permission) {
+    return ((permission & ADMIN_PERM) > 0);
+  }
+
+  public static boolean isMember(int permission) {
+    return ((permission & MEMBER_PERM) > 0);
+  }
+
+  public byte getPermission(Uuid user){
+    if (permissions.containsKey(user))
+      return permissions.get(user);
+    return -1;
+  }
+
+  public void togglePermission(Uuid user, byte permission) {
+    if (permissions.containsKey(user)) {
+      byte newPermission = (byte) (permissions.get(user) ^ permission);
+      if (newPermission == 0) {
+        permissions.remove(user);
+      }
+      else {
+        permissions.put(user, newPermission);
+      }
+      return;
+    }
+    permissions.put(user, permission);
   }
 }

@@ -73,7 +73,25 @@ public final class Model {
 
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
-  
+
+  public int togglePermission(Uuid user, Uuid targetUser, int permission, Uuid conversation) {
+    ConversationHeader foundConversation = conversationById().first(conversation);
+    int sourcePerm = foundConversation.getPermission(user);
+
+    int targetPerm = foundConversation.getPermission(targetUser);
+    targetPerm = (targetPerm == -1) ? 0 : targetPerm;
+    int permissionDiff = permission ^ targetPerm & 0b0111;
+
+    if (((permissionDiff & ConversationHeader.ADMIN_PERM) >= 1)  && !ConversationHeader.isOwner(sourcePerm)) {
+      return -1;
+    }
+    if (((permissionDiff & ConversationHeader.MEMBER_PERM) >= 1) && !(ConversationHeader.isOwner(sourcePerm) || ConversationHeader.isAdmin(sourcePerm))) {
+      return -1;
+    }
+    foundConversation.togglePermission(targetUser, (byte) permission);
+    return foundConversation.getPermission(targetUser);
+  }
+
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);

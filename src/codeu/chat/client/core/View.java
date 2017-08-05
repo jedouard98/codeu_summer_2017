@@ -134,7 +134,7 @@ final class View implements BasicView {
   }
 
   @Override
-  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids) {
+  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids, Uuid user, Uuid conversation) {
 
     final Collection<ConversationPayload> conversations = new ArrayList<>();
 
@@ -142,6 +142,8 @@ final class View implements BasicView {
 
       Serializers.INTEGER.write(connection.out(), NetworkCode.GET_CONVERSATIONS_BY_ID_REQUEST);
       Serializers.collection(Uuid.SERIALIZER).write(connection.out(), ids);
+      Uuid.SERIALIZER.write(connection.out(), user);
+      Uuid.SERIALIZER.write(connection.out(), conversation);
 
       if (Serializers.INTEGER.read(connection.in()) == NetworkCode.GET_CONVERSATIONS_BY_ID_RESPONSE) {
         conversations.addAll(Serializers.collection(ConversationPayload.SERIALIZER).read(connection.in()));

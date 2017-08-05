@@ -127,30 +127,34 @@ public final class BasicControllerTest {
     assertEquals("how are you", t2.next());
     assertFalse(t2.hasNext());
   }
-  
+
   public void testFollowUser() {
     final User user = controller.newUser("user");
     final User user1 = controller.newUser("user");
-    
+
     User.follow(user, user1);
     assertEquals(1, user.followees.size());
   }
-  
+
   public void testFollowConvo() {
+
     final User user = controller.newUser("user");
-    final Conversation convo1 = controller.newConversation("convo");
-    
-    User.follow(user, convo1);
+    final ConversationHeader convo1 = controller.newConversation("convo", user.id);
+
+    controller.followConversation(user.id, convo1.id);
     assertEquals(1, user.followees.size());
   }
-  
-  public void testPersistentStorage() {
-    TransactionLog tl = new TransactionLog(controller, "test", model);
-    final User u = controller.newUser("tester");
-    tl.writeCreateUser(u);
-    tl.flush();
-    File f = new File("test");
-    Scanner s = new Scanner(f);
-    
-    assertTrue(s.hasNext());
+
+  public void testPermissionsToggle() {
+    final User user = controller.newUser("user");
+    final ConversationHeader convo1 = controller.newConversation("convo", user.id);
+
+    assertFalse(ConversationHeader.isMember(convo1.getPermission(user.id)));
+
+    convo1.togglePermission(user.id, ConversationHeader.MEMBER_PERM);
+
+    assertTrue(ConversationHeader.isMember(convo1.getPermission(user.id)));
+    assertFalse(ConversationHeader.isAdmin(convo1.getPermission(user.id)));
+    assertFalse(ConversationHeader.isOwner(convo1.getPermission(user.id)));
+  }
 }

@@ -40,6 +40,16 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
+  public int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+    ConversationHeader foundConversation = model.conversationById().first(conversation);
+
+    int sourceUser = foundConversation.getPermission(user);
+    int targetUser = foundConversation.getPermission(userToBeChanged);
+    
+    return model.togglePermission(user, userToBeChanged, permission, conversation);
+  }
+
+  @Override
   public String newStatusUpdate(Uuid user) {
     return model.statusUpdate(user);
   }
