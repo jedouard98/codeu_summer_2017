@@ -45,7 +45,11 @@ public final class ConversationContext {
     this.controller = controller;
   }
 
-  public MessageContext add(String messageBody) {
+  public void togglePermission(Uuid userToBeChanged, int permission, Uuid conversation) {
+    controller.togglePermission(user.id, userToBeChanged, permission, conversation);
+  }
+
+  public MessageContext add(String messageBody) throws Exception {
 
     final Message message = controller.newMessage(user.id,
                                                   conversation.id,
@@ -56,8 +60,7 @@ public final class ConversationContext {
         new MessageContext(message, view);
   }
 
-  public MessageContext firstMessage() {
-
+  public MessageContext firstMessage() throws Exception {
     // As it is possible for the conversation to have been updated, so fetch
     // a new copy.
     final ConversationPayload updated = getUpdated();
@@ -67,7 +70,7 @@ public final class ConversationContext {
         getMessage(updated.firstMessage);
   }
 
-  public MessageContext lastMessage() {
+  public MessageContext lastMessage() throws Exception {
 
     // As it is possible for the conversation to have been updated, so fetch
     // a new copy.
@@ -78,9 +81,9 @@ public final class ConversationContext {
         getMessage(updated.lastMessage);
   }
 
-  private ConversationPayload getUpdated() {
+  private ConversationPayload getUpdated() throws Exception {
     final Collection<Uuid> ids = Arrays.asList(conversation.id);
-    final Iterator<ConversationPayload> payloads = view.getConversationPayloads(ids).iterator();
+    final Iterator<ConversationPayload> payloads = view.getConversationPayloads(ids, user.id, conversation.id).iterator();
     return payloads.hasNext() ? payloads.next() : null;
   }
 

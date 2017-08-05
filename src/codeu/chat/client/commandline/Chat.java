@@ -33,6 +33,8 @@ import codeu.chat.util.Uuid;
 
 import codeu.chat.common.User;
 
+import codeu.chat.common.ConversationHeader;
+
 public final class Chat {
 
   // PANELS
@@ -563,6 +565,8 @@ public final class Chat {
         System.out.println("    List all messages in the current conversation.");
         System.out.println("  m-add <message>");
         System.out.println("    Add a new message to the current conversation as the current user.");
+        System.out.println("  toggle-permission <user> <permission> ...");
+        System.out.println("    Toggle the permissions (member/admin/owner) of other users.");
         System.out.println("  info");
         System.out.println("    Display all info about the current conversation.");
         System.out.println("  uptime");
@@ -585,18 +589,24 @@ public final class Chat {
       @Override
       public void invoke(Tokenizer args) {
         System.out.println("--- start of conversation ---");
-        for (MessageContext message = conversation.firstMessage();
-                            message != null;
-                            message = message.next()) {
-          System.out.println();
-          System.out.format("USER : %s\n", message.message.author);
-          System.out.format("SENT : %s\n", message.message.creation);
-          System.out.println();
-          System.out.println(message.message.content);
-          System.out.println();
+
+        try {
+          for (MessageContext message = conversation.firstMessage();
+                              message != null;
+                              message = message.next()) {
+            System.out.println();
+            System.out.format("USER : %s\n", message.message.author);
+            System.out.format("SENT : %s\n", message.message.creation);
+            System.out.println();
+            System.out.println(message.message.content);
+            System.out.println();
+          }
         }
-        System.out.println("---  end of conversation  ---");
-      }
+        catch (Exception e) {
+          System.out.println("You do not have permission to view this content");
+        }
+          System.out.println("---  end of conversation  ---");
+        }
     });
 
     // M-ADD (add message)
@@ -612,7 +622,12 @@ public final class Chat {
           System.out.println("ERROR: Too many arguments for command");
         }
         else if (message.length() > 0) {
-          conversation.add(message);
+          try {
+            conversation.add(message);
+          }
+          catch (Exception ex) {
+            System.out.println("You do not have permission to add new messages");
+          }
         } else {
           System.out.println("ERROR: Messages must contain text");
         }
@@ -631,6 +646,56 @@ public final class Chat {
         System.out.format("  Title : %s\n", conversation.conversation.title);
         System.out.format("  Id    : UUID:%s\n", conversation.conversation.id);
         System.out.format("  Owner : %s\n", conversation.conversation.owner);
+      }
+    });
+
+    // TOGGLE-PERMISSION (user's permission to be changed) (permission)
+    //
+    // Add a command to allow authorized users to toggle permissions of other users
+    //
+    panel.register("toggle-permission", new Panel.Command() {
+      @Override
+      public void invoke(Tokenizer args) {
+        final String name = args.hasNext() ? args.next().trim() : "";
+
+        int permission = 0;
+
+        while (args.hasNext()) {
+          final String permissionString = args.hasNext() ? args.next().trim().toLowerCase() : "";
+          switch (permissionString) {
+            case "admin":  permission = permission ^ ConversationHeader.ADMIN_PERM;
+                           break;
+            case "owner":  permission = permission ^ ConversationHeader.OWNER_PERM;
+                           break;
+            case "member": permission = permission ^ ConversationHeader.MEMBER_PERM;
+                           break;
+            default:       System.out.println("ERROR: input is not a valid condition"); return;
+          }
+        }
+        if (conversation.conversation.isMember(conversation.user.id)) {
+          System.out.println("You do not have permission to change permissions.");
+          return;
+        }
+        if (name.length() < 0) {
+          System.out.println("ERROR: Missing argument");
+          return;
+        }
+        else if (findUser(name) == null) {
+          System.out.format("ERROR: Failed to find user '%s'\n", name);
+          return;
+        }
+
+        final User permissionChangedUser = findUser(name);
+        conversation.togglePermission(permissionChangedUser.id, permission, conversation.conversation.id);
+      }
+
+      private User findUser(String name) {
+        for (final UserContext context : context.allUsers()) {
+          if (context.user.name.equals(name)) {
+            return context.user;
+          }
+        }
+        return null;
       }
     });
 

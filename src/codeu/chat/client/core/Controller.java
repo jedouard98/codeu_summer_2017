@@ -40,6 +40,24 @@ final class Controller implements BasicController {
   }
 
   @Override
+  public void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+    try (final Connection connection = source.connect()) {
+      Serializers.INTEGER.write(connection.out(), NetworkCode.NEW_PERMISSION_CHANGE_REQUEST);
+      Uuid.SERIALIZER.write(connection.out(), user);
+      Uuid.SERIALIZER.write(connection.out(), userToBeChanged);
+      Serializers.INTEGER.write(connection.out(), permission);
+      Uuid.SERIALIZER.write(connection.out(), conversation);
+
+      if (!(Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE)) {
+        LOG.error("Response from server failed.");
+      }
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+  }
+
+  @Override
   public String newStatusUpdate(Uuid user) {
 
     String statusUpdate = null;
@@ -57,7 +75,6 @@ final class Controller implements BasicController {
       System.out.println("ERROR: Exception during call on server. Check log for details.");
       LOG.error(ex, "Exception during call on server.");
     }
-
     return statusUpdate;
   }
 
@@ -130,7 +147,7 @@ final class Controller implements BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid author, Uuid conversation, String body) {
+  public Message newMessage(Uuid author, Uuid conversation, String body) throws Exception {
 
     Message response = null;
 

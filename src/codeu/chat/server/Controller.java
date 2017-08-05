@@ -40,6 +40,11 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
+  public void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+    model.togglePermission(user, userToBeChanged, permission, conversation);
+  }
+
+  @Override
   public String newStatusUpdate(Uuid user) {
     return model.statusUpdate(user);
   }
@@ -65,7 +70,7 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid author, Uuid conversation, String body) {
+  public Message newMessage(Uuid author, Uuid conversation, String body) throws Exception {
     return newMessage(createId(), author, conversation, body, Time.now());
   }
 
@@ -80,11 +85,11 @@ public final class Controller implements RawController, BasicController {
   }
 
   @Override
-  public Message newMessage(Uuid id, Uuid author, Uuid conversation, String body, Time creationTime) {
+  public Message newMessage(Uuid id, Uuid author, Uuid conversation, String body, Time creationTime) throws Exception {
     model.conversationById().first(conversation).size++;
 
     final User foundUser = model.userById().first(author);
-    final ConversationPayload foundConversation = model.conversationPayloadById().first(conversation);
+    final ConversationPayload foundConversation = model.conversationPayloadById(author, conversation).first(conversation);
 
     Message message = null;
 

@@ -69,8 +69,8 @@ public final class View implements BasicView, SinglesView {
   }
 
   @Override
-  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids) {
-    return intersect(model.conversationPayloadById(), ids);
+  public Collection<ConversationPayload> getConversationPayloads(Collection<Uuid> ids, Uuid user, Uuid conversation) throws Exception{
+    return intersect(model.conversationPayloadById(user, conversation), ids);
   }
 
   @Override
