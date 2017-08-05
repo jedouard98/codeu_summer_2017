@@ -25,7 +25,7 @@ import codeu.chat.util.Uuid;
 
 import java.util.HashMap;
 
-public final class User {
+public class User {
 
   public static final Serializer<User> SERIALIZER = new Serializer<User>() {
 
