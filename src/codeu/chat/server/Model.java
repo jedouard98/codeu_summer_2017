@@ -74,14 +74,24 @@ public final class Model {
   private final String version = "1.1";
   private final Time serverStartTime = Time.now();
 
-  public void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
+  public int togglePermission(Uuid user, Uuid targetUser, int permission, Uuid conversation) {
     ConversationHeader foundConversation = conversationById().first(conversation);
-    if (foundConversation.getPermission(user) > 1) {
-      System.out.println("The user's permission before " + foundConversation.getPermission(userToBeChanged));
-      foundConversation.togglePermission(userToBeChanged, (byte) permission);
-      System.out.println("This is the user's permission after" + foundConversation.getPermission(userToBeChanged));
+    int sourcePerm = foundConversation.getPermission(user);
+
+    int targetPerm = foundConversation.getPermission(targetUser);
+    targetPerm = (targetPerm == -1) ? 0 : targetPerm;
+    int permissionDiff = permission ^ targetPerm & 0b0111;
+
+    if (((permissionDiff & ConversationHeader.ADMIN_PERM) >= 1)  && !ConversationHeader.isOwner(sourcePerm)) {
+      return -1;
     }
+    if (((permissionDiff & ConversationHeader.MEMBER_PERM) >= 1) && !(ConversationHeader.isOwner(sourcePerm) || ConversationHeader.isAdmin(sourcePerm))) {
+      return -1;
+    }
+    foundConversation.togglePermission(targetUser, (byte) permission);
+    return foundConversation.getPermission(targetUser);
   }
+
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);
@@ -168,12 +178,7 @@ public final class Model {
     return conversationByText;
   }
 
-  public StoreAccessor<Uuid, ConversationPayload> conversationPayloadById(Uuid user, Uuid conversation) throws Exception {
-    ConversationHeader conversationServer = conversationById.first(conversation);
-    System.out.println("This is the user's permission: " + conversationServer.getPermission(user));
-    if (conversationServer.getPermission(user) == -1) {
-      throw new Exception("You do not have access to this conversation.");
-    }
+  public StoreAccessor<Uuid, ConversationPayload> conversationPayloadById() {
     return conversationPayloadById;
   }
 
