@@ -26,7 +26,7 @@ import codeu.chat.common.ConversationHeader;
 //   should be treated as read only data as manipulating any data returned
 //   from the controller may have no effect on the server's state.
 public interface BasicController {
-  void togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation);
+  int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation);
   // UNFOLLOW USER
   //
   //   Removes an established relationship between a user and another user.
@@ -73,7 +73,7 @@ public interface BasicController {
   //   or else the server won't apply the change. If the operation is
   //   successful, a Message object will be returned representing the full
   //   state of the message on the server.
-  Message newMessage(Uuid author, Uuid conversation, String body) throws Exception;
+  Message newMessage(Uuid author, Uuid conversation, String body);
 
   // NEW USER
   //
