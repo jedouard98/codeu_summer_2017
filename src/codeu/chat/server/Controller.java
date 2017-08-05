@@ -114,7 +114,7 @@ public final class Controller implements RawController, BasicController {
 
     Message message = null;
 
-    if (foundUser != null && foundConversation != null && isIdFree(id)) {
+    if (foundConversation != null && isIdFree(id)) {
 
       message = new Message(id, Uuid.NULL, Uuid.NULL, creationTime, author, body);
       model.add(message);
