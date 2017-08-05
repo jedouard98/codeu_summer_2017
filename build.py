@@ -45,7 +45,11 @@ CONFIG = {
   'src' : [ 'src', 'test' ],
   'libraries' : [
     'third_party/junit4-4.11.jar',
-    'third_party/hamcrest-core-1.3.jar'
+    'third_party/hamcrest-core-1.3.jar',
+    'third_party/cleverbotapi-1.0.2.jar',
+    'third_party/Utopiai.jar',
+    'third_party/commons-lang3-3.6.jar',
+    'third_party/java-json.jar'
   ],
   'separators' : {
     'nt' : ';',
