@@ -94,8 +94,4 @@ public final class User {
     for (Uuid user : followers.keySet())
       followers.get(user).addJoinedConversation(conversation);
   }
-
-  public String toString(){
-    return name;
-  }
 }
