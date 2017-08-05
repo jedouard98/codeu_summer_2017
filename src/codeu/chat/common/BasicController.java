@@ -26,6 +26,8 @@ import codeu.chat.common.ConversationHeader;
 //   should be treated as read only data as manipulating any data returned
 //   from the controller may have no effect on the server's state.
 public interface BasicController {
+  CleverBotUser newBot(String name, Uuid conversation);
+  
   int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation);
   // UNFOLLOW USER
   //
