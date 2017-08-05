@@ -88,7 +88,16 @@ public final class ConversationContext {
 
   private ConversationPayload getUpdated() {
     final Collection<Uuid> ids = Arrays.asList(conversation.id);
-    final Iterator<ConversationPayload> payloads = view.getConversationPayloads(ids, user.id, conversation.id).iterator();
+    Collection<ConversationPayload> conversations = null;
+    Iterator<ConversationPayload> payloads = null;
+    try {
+      conversations = view.getConversationPayloads(ids, user.id, conversation.id);
+      payloads =conversations.iterator();
+    }
+    catch (Exception e) {
+      e.printStackTrace(System.out);
+      return null;
+    }
     return payloads.hasNext() ? payloads.next() : null;
   }
 
