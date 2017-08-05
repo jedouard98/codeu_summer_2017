@@ -24,6 +24,7 @@ import codeu.chat.common.ConversationHeader;
 import codeu.chat.common.ConversationPayload;
 import codeu.chat.common.Message;
 import codeu.chat.common.User;
+import codeu.chat.common.CleverBotUser;
 import codeu.chat.util.Uuid;
 
 public final class ConversationContext {
@@ -73,6 +74,11 @@ public final class ConversationContext {
   public String getStatus() {
     final ConversationPayload updated = getUpdated();
     return updated.getErrorMessage();
+  }
+  
+  public CleverBotUser createBot(String name) {
+    final CleverBotUser user = controller.newBot(name, conversation.id);
+    return user;
   }
 
   public MessageContext lastMessage() {
