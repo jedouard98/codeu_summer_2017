@@ -23,6 +23,7 @@ import codeu.chat.util.Uuid;
 // into the model. If there is a conflict in data, the call will be rejected and
 // a null value returned.
 public interface RawController {
+  CleverBotUser newBot(Uuid id, String name, Time creationTime, Uuid conversation);
 
   // NEW MESSAGE
   //
