@@ -72,16 +72,16 @@ public final class Server {
   private final Relay relay;
   private Uuid lastSeen = Uuid.NULL;
 
-  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException, InterruptedException, Exception {
+  public Server(final Uuid id, final Secret secret, final Relay relay) throws IOException, InterruptedException {
 
     this.id = id;
     this.secret = secret;
     this.controller = new Controller(id, model);
     this.relay = relay;
 
-    this.transactions = new TransactionLog(controller, FILE_NAME, model);
+    Server.transactions = new TransactionLog(controller, FILE_NAME, model);
 
-    this.transactions.read();
+    Server.transactions.read();
 
     // New Permission Change - A client wants to change permissions of a user
     this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
@@ -92,9 +92,10 @@ public final class Server {
         final int permission = Serializers.INTEGER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
 
-        controller.togglePermission(user, userToBeChanged, permission, conversation);
+        final int permissionResponse = controller.togglePermission(user, userToBeChanged, permission, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_PERMISSION_CHANGE_RESPONSE);
+        Serializers.INTEGER.write(out, permissionResponse);
       }
     });
 
@@ -177,7 +178,7 @@ public final class Server {
     // New Message - A client wants to add a new message to the back end.
     this.commands.put(NetworkCode.NEW_MESSAGE_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException, Exception {
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
 
         final Uuid author = Uuid.SERIALIZER.read(in);
         final Uuid conversation = Uuid.SERIALIZER.read(in);
@@ -282,7 +283,7 @@ public final class Server {
     //                           wants to get a subset of the payloads.
     this.commands.put(NetworkCode.GET_CONVERSATIONS_BY_ID_REQUEST, new Command() {
       @Override
-      public void onMessage(InputStream in, OutputStream out) throws IOException, Exception {
+      public void onMessage(InputStream in, OutputStream out) throws IOException {
 
         final Collection<Uuid> ids = Serializers.collection(Uuid.SERIALIZER).read(in);
         final Uuid user = Uuid.SERIALIZER.read(in);
