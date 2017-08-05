@@ -177,7 +177,5 @@ public final class BasicControllerTest {
     assertFalse(convo1.isMember(user1.id));
     assertFalse(convo1.isAdmin(user1.id));
     assertFalse(convo1.isOwner(user1.id));
-    
-     assertTrue(convo1.conversationPayload.getErrorMessage != "You do not have permission to add messages");
   }
 }
