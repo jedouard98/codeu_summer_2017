@@ -38,6 +38,33 @@ final class Controller implements BasicController {
   public Controller(ConnectionSource source) {
     this.source = source;
   }
+  
+  @Override
+  public CleverBotUser newBot(String name, Uuid conversation) {
+
+    CleverBotUser response = null;
+
+    try (final Connection connection = source.connect()) {
+
+      Serializers.INTEGER.write(connection.out(), NetworkCode.NEW_CLEVER_BOT_REQUEST);
+      Serializers.STRING.write(connection.out(), name);
+      Uuid.SERIALIZER.write(connection.out(), conversation);
+
+      LOG.info("newBot: Request completed.");
+
+      if (Serializers.INTEGER.read(connection.in()) == NetworkCode.NEW_CLEVER_BOT_RESPONSE) {
+        response = Serializers.nullable(CleverBotUser.SERIALIZER).read(connection.in());
+        LOG.info("newBot: Response completed.");
+      } else {
+        LOG.error("Response from server failed.");
+      }
+    } catch (Exception ex) {
+      System.out.println("ERROR: Exception during call on server. Check log for details.");
+      LOG.error(ex, "Exception during call on server.");
+    }
+
+    return response;
+  }
 
   @Override
   public int togglePermission(Uuid user, Uuid userToBeChanged, int permission, Uuid conversation) {
