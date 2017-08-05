@@ -36,6 +36,7 @@ import codeu.chat.common.NetworkCode;
 import codeu.chat.common.Relay;
 import codeu.chat.common.Secret;
 import codeu.chat.common.User;
+import codeu.chat.common.CleverBotUser;
 import codeu.chat.util.Logger;
 import codeu.chat.util.Serializers;
 import codeu.chat.util.Time;
@@ -82,6 +83,20 @@ public final class Server {
     Server.transactions = new TransactionLog(controller, FILE_NAME, model);
 
     Server.transactions.read();
+    
+    // New Bot - A client wants to add a new bot to the back end.
+    this.commands.put(NetworkCode.NEW_CLEVER_BOT_REQUEST,  new Command() {
+      @Override
+      public void onMessage(InputStream in, OutputStream out) throws IOException, InterruptedException {
+
+        final String name = Serializers.STRING.read(in);
+        final Uuid conversation = Uuid.SERIALIZER.read(in);
+        final CleverBotUser user = controller.newBot(name, conversation);
+
+        Serializers.INTEGER.write(out, NetworkCode.NEW_CLEVER_BOT_RESPONSE);
+        Serializers.nullable(CleverBotUser.SERIALIZER).write(out, user);
+      }
+    });
 
     // New Permission Change - A client wants to change permissions of a user
     this.commands.put(NetworkCode.NEW_PERMISSION_CHANGE_REQUEST, new Command() {
@@ -185,6 +200,7 @@ public final class Server {
         final String content = Serializers.STRING.read(in);
 
         final Message message = controller.newMessage(author, conversation, content);
+        controller.botResponse(message.content, conversation);
 
         Serializers.INTEGER.write(out, NetworkCode.NEW_MESSAGE_RESPONSE);
         Serializers.nullable(Message.SERIALIZER).write(out, message);
