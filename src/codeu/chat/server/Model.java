@@ -82,7 +82,6 @@ public final class Model {
       System.out.println("This is the user's permission after" + foundConversation.getPermission(userToBeChanged));
     }
   }
-
   public void add(User user) {
     userConversationTracking.put(user.id, new HashMap<Uuid, Integer>());
     userById.insert(user.id, user);

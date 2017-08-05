@@ -127,4 +127,55 @@ public final class BasicControllerTest {
     assertEquals("how are you", t2.next());
     assertFalse(t2.hasNext());
   }
+  
+  public void testFollowUser() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    
+    User.follow(user, user1);
+    assertEquals(1, user.followees.size());
+  }
+  
+  public void testFollowConvo() {
+    final User user = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    
+    User.follow(user, convo1);
+    assertEquals(1, user.followees.size());
+  }
+  
+  public void testPersistentStorage() {
+    TransactionLog tl = new TransactionLog(controller, "test", model);
+    final User u = controller.newUser("tester");
+    tl.writeCreateUser(u);
+    tl.flush();
+    File f = new File("test");
+    Scanner s = new Scanner(f);
+    
+    assertTrue(s.hasNext());
+  }
+  
+  public void testPermissionsToggle() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    final Conversation convo2 = controller.newConversation("convo");
+         
+    convo1.togglePermission(user.id, 001);
+    
+    assertTrue(convo1.isMember(user.id));
+    assertFalse(convo1.isAdmin(user.id));
+    assertFalse(convo1.isOwner(user.id));
+  }
+  
+  public void testPermissionReject() {
+    final User user = controller.newUser("user");
+    final User user1 = controller.newUser("user");
+    final Conversation convo1 = controller.newConversation("convo");
+    final Conversation convo2 = controller.newConversation("convo");
+    
+    assertFalse(convo1.isMember(user1.id));
+    assertFalse(convo1.isAdmin(user1.id));
+    assertFalse(convo1.isOwner(user1.id));
+  }
 }
