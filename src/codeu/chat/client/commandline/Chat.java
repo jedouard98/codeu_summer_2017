@@ -29,9 +29,6 @@ import codeu.chat.util.Uuid;
 
 import codeu.chat.util.Tokenizer;
 import codeu.chat.util.Time;
-import codeu.chat.util.Uuid;
-
-import codeu.chat.common.User;
 
 import codeu.chat.common.ConversationHeader;
 
@@ -351,8 +348,6 @@ public final class Chat {
         final User userToBeFollowed = findUser(name);
         user.followUser(userToBeFollowed);
       }
-      // TODO: add this function to user context to avoid its duplication
-
       // Find the first user with the given name and return a user context
       // for that user. If no user is found, the function will return null.
       private User findUser(String name) {
@@ -480,18 +475,6 @@ public final class Chat {
         return null;
       }
     });
-      
-      // Find the first conversation with the given name and return its context.
-      // If no conversation has the given name, this will return null.
-      private Uuid find(String title) {
-        for (final ConversationContext context : user.conversations()) {
-          if (title.equals(context.conversation.title)) {
-            return context.conversation.id;
-          }
-        }
-        return null;
-      }
-    });
 
     // C-JOIN (join conversation)
     //
@@ -588,8 +571,12 @@ public final class Chat {
     panel.register("m-list", new Panel.Command() {
       @Override
       public void invoke(Tokenizer args) {
-        System.out.println("--- start of conversation ---");
+        if (conversation.getStatus().length() > 0) {
+          System.out.println(conversation.getStatus());
+          return;
+        }
 
+        System.out.println("--- start of conversation ---");
         try {
           for (MessageContext message = conversation.firstMessage();
                               message != null;
@@ -617,6 +604,11 @@ public final class Chat {
     panel.register("m-add", new Panel.Command() {
       @Override
       public void invoke(Tokenizer args) {
+        if (conversation.getStatus().length() > 0) {
+          System.out.println(conversation.getStatus());
+          return;
+        }
+
         final String message = args.hasNext() ? args.next().trim() : "";
         if (args.hasNext()) {
           System.out.println("ERROR: Too many arguments for command");
@@ -665,17 +657,12 @@ public final class Chat {
           switch (permissionString) {
             case "admin":  permission = permission ^ ConversationHeader.ADMIN_PERM;
                            break;
-            case "owner":  permission = permission ^ ConversationHeader.OWNER_PERM;
-                           break;
             case "member": permission = permission ^ ConversationHeader.MEMBER_PERM;
                            break;
             default:       System.out.println("ERROR: input is not a valid condition"); return;
           }
         }
-        if (conversation.conversation.isMember(conversation.user.id)) {
-          System.out.println("You do not have permission to change permissions.");
-          return;
-        }
+
         if (name.length() < 0) {
           System.out.println("ERROR: Missing argument");
           return;
@@ -686,7 +673,13 @@ public final class Chat {
         }
 
         final User permissionChangedUser = findUser(name);
-        conversation.togglePermission(permissionChangedUser.id, permission, conversation.conversation.id);
+        int permissionValue = conversation.togglePermission(permissionChangedUser.id, permission, conversation.conversation.id);
+        if (permissionValue == -1) {
+          System.out.println("You do not have permission to change other users.");
+        }
+        else {
+          System.out.println(name + "'s status is now:" + conversation.conversation.formatPermission(permissionValue));
+        }
       }
 
       private User findUser(String name) {
